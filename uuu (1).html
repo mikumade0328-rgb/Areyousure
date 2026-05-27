@@ -1,796 +1,1052 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>美崙溪記憶之牆 - 互動留言板</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ForMoSac 花蓮美崙溪流域文化重織與韌性水路</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        :root {
-            --p325-cyan: #55C6D9; 
-            --p360-green: #00AF3F; 
-            --bg-mist: #F0F8F7; 
-            --card-rock: #ECECE7; 
-            --text-dark: #2C3E50; 
-            --parchment: #FCFAF2; 
-            
-            --primary-gradient: linear-gradient(135deg, var(--p325-cyan) 0%, #A8E6CF 50%, var(--p360-green) 100%);
-            --button-gradient: linear-gradient(135deg, var(--p360-green) 0%, var(--p325-cyan) 100%);
-            
-            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.07);
-            --shadow-lg: 0 15px 30px rgba(0, 175, 63, 0.15); 
-            --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
-        }
+:root {
+    --p325-cyan: #55C6D9;
+    --p360-green: #00AF3F;
+    --river-deep: #1B6F79;
+    --river-night: #173D45;
+    --moss: #5D8B4F;
+    --silt: #B9B49D;
+    --bg-mist: #F0F8F7;
+    --card-rock: #ECECE7;
+    --text-dark: #2C3E50;
+    --parchment: #FCFAF2;
+    --primary-gradient: linear-gradient(135deg, var(--p325-cyan) 0%, #A8E6CF 50%, var(--p360-green) 100%);
+    --button-gradient: linear-gradient(135deg, var(--p360-green) 0%, var(--p325-cyan) 100%);
+    --shadow-sm: 0 4px 6px rgba(0, 0, 0, .07);
+    --shadow-lg: 0 15px 30px rgba(0, 175, 63, .15);
+    --shadow-xl: 0 20px 40px rgba(0, 0, 0, .2);
+}
 
-        body {
-            font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
-            overflow: hidden;
-            background: var(--bg-mist);
-            color: var(--text-dark);
-        }
+body {
+    font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
+    overflow: hidden;
+    background: var(--bg-mist);
+    color: var(--text-dark);
+}
 
-        .page {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
-            transform: scale(1.05); 
-        }
+button,
+textarea {
+    font: inherit;
+}
 
-        .page.active {
-            display: flex;
-            opacity: 1;
-            z-index: 10;
-            transform: scale(1);
-        }
+.page {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.05);
+    transition: opacity .5s ease, transform .5s ease, visibility .5s;
+    z-index: 1;
+}
 
-        /* ===== 首頁 (COVER) ===== */
-        #cover {
-            background: var(--primary-gradient);
-            align-items: center;
-            justify-content: space-between;
-            padding: 60px 80px;
-            position: relative;
-            overflow: hidden;
-        }
+.page.active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    z-index: 10;
+}
 
-        #cover::before {
-            content: '';
-            position: absolute;
-            bottom: -50px;
-            left: 0;
-            width: 100%;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50% 50% 0 0; 
-            z-index: 1;
-        }
+#cover {
+    background: var(--primary-gradient);
+    justify-content: space-between;
+    padding: 60px 80px;
+    position: relative;
+    overflow: hidden;
+}
 
-        @keyframes slideInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+#cover::before {
+    content: "";
+    position: absolute;
+    bottom: -50px;
+    left: 0;
+    width: 100%;
+    height: 300px;
+    background: rgba(255, 255, 255, .12);
+    border-radius: 50% 50% 0 0;
+}
 
-        .cover-content {
-            flex: 1;
-            z-index: 2;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2); 
-        }
+#cover::after {
+    content: "";
+    position: absolute;
+    inset: auto -20% -26% -20%;
+    height: 50%;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,.28), rgba(255,255,255,0) 68%);
+    animation: slowDrift 12s ease-in-out infinite;
+}
 
-        .cover-title {
-            font-size: 64px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            letter-spacing: 2px;
-            animation: slideInUp 0.8s ease-out;
-        }
-        
-        .cover-subtitle {
-            font-size: 20px;
-            opacity: 0.95;
-            margin-bottom: 40px;
-            line-height: 1.8;
-            animation: slideInUp 0.8s ease-out 0.1s backwards;
-        }
+.cover-content {
+    flex: 1;
+    color: white;
+    z-index: 2;
+}
 
-        .btn-start {
-            display: inline-block;
-            padding: 18px 50px;
-            background: white; 
-            border: 2px solid white;
-            color: var(--p360-green); 
-            font-size: 18px;
-            font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
+.cover-title {
+    font-size: clamp(42px, 6vw, 72px);
+    font-weight: 700;
+    letter-spacing: 0;
+    margin-bottom: 20px;
+}
 
-        .btn-start:hover {
-            background: var(--p325-cyan);
-            color: white;
-            border-color: var(--p325-cyan);
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: var(--shadow-lg);
-        }
+.cover-subtitle {
+    font-size: 20px;
+    line-height: 1.8;
+    margin-bottom: 40px;
+}
 
-        .cover-preview {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            padding-left: 60px;
-            z-index: 2;
-        }
+.btn-start,
+.btn-submit,
+.next-btn,
+.btn-restart {
+    border: none;
+    cursor: pointer;
+    transition: transform .25s ease, filter .25s ease, background .25s ease;
+}
 
-        .preview-item {
-            aspect-ratio: 1;
-            background: rgba(255, 255, 255, 0.2); 
-            border-radius: 50% 20% 50% 20%; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 90px;
-            backdrop-filter: blur(5px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            animation: float 6s ease-in-out infinite;
-        }
+.btn-start {
+    padding: 18px 50px;
+    border-radius: 999px;
+    background: white;
+    color: var(--p360-green);
+    font-size: 18px;
+    font-weight: 700;
+}
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-        }
+.btn-start:hover,
+.btn-submit:hover,
+.next-btn:hover,
+.btn-restart:hover {
+    transform: translateY(-4px);
+    filter: brightness(1.03);
+}
 
-        .preview-item:nth-child(2) { animation-delay: 1s; border-radius: 20% 50% 20% 50%; }
-        .preview-item:nth-child(3) { animation-delay: 2s; border-radius: 20% 50% 20% 50%; }
-        .preview-item:nth-child(4) { animation-delay: 3s; }
+.cover-preview {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    width: 100%;
+    max-width: 500px;
+    z-index: 2;
+}
 
-        /* ===== STEP1 (選圖塊) & STEP2 (輸入留言) ===== */
-        #step1, #step2 {
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(to bottom, var(--bg-mist) 0%, #E0F2F1 100%);
-            padding: 60px 40px;
-        }
+.preview-item {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 90px;
+    background: rgba(255, 255, 255, .18);
+    border-radius: 32px;
+    backdrop-filter: blur(5px);
+    animation: float 6s ease-in-out infinite;
+}
 
-        .step-title {
-            font-size: 36px;
-            color: var(--text-dark);
-            margin-bottom: 60px;
-            font-weight: 600;
-        }
+.preview-item:nth-child(2) {
+    animation-delay: 1s;
+}
 
-        .emoji-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 30px;
-            max-width: 800px;
-        }
+.preview-item:nth-child(3) {
+    animation-delay: 2s;
+}
 
-        .emoji-card {
-            aspect-ratio: 1;
-            background: white;
-            border-radius: 30px; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 90px;
-            cursor: pointer;
-            box-shadow: var(--shadow-sm);
-            transition: 0.3s;
-            border: 4px solid transparent;
-        }
+.preview-item:nth-child(4) {
+    animation-delay: 3s;
+}
 
-        .emoji-card:hover {
-            transform: translateY(-15px);
-            border-color: var(--p325-cyan);
-            box-shadow: 0 20px 40px rgba(85,198,217,0.2); 
-        }
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
 
-        .input-container {
-            background: var(--parchment); 
-            border-radius: 24px;
-            padding: 50px;
-            box-shadow: var(--shadow-xl);
-            max-width: 600px;
-            width: 100%;
-            border: 1px solid #E6E0C8; 
-        }
+@keyframes slowDrift {
+    0%, 100% { transform: translateX(-4%); }
+    50% { transform: translateX(4%); }
+}
 
-        textarea {
-            width: 100%;
-            height: 140px;
-            padding: 20px;
-            border: 2px solid #D8D2B9;
-            border-radius: 16px;
-            font-size: 17px;
-            resize: none;
-            background: rgba(255,255,255,0.7);
-            line-height: 1.6;
-            color: #3E2723;
-        }
-        
-        textarea:focus {
-            outline: none;
-            border-color: var(--p360-green);
-            background: white;
-            box-shadow: 0 0 0 4px rgba(0, 175, 63, 0.1);
-        }
+#step1,
+#step2 {
+    background: linear-gradient(to bottom, var(--bg-mist) 0%, #E0F2F1 100%);
+    padding: 60px 20px;
+}
 
-        .char-count {
-            text-align: right;
-            color: #8D6E63;
-            font-size: 15px;
-            margin-top: 10px;
-        }
+.step-title {
+    font-size: 36px;
+    margin-bottom: 40px;
+    letter-spacing: 0;
+}
 
-        .btn-submit {
-            width: 100%;
-            padding: 16px;
-            background: var(--button-gradient);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: 0.3s;
-        }
+.emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    max-width: 800px;
+}
 
-        .btn-submit:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(85,198,217,0.3);
-        }
+.emoji-card {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 90px;
+    background: white;
+    border-radius: 26px;
+    cursor: pointer;
+    transition: transform .3s ease, box-shadow .3s ease;
+    box-shadow: var(--shadow-sm);
+}
 
-        /* ===== STEP3 動態留言牆 ===== */
-        #step3 {
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(to bottom, #E0F7FA 0%, #E8F5E9 100%);
-            padding: 40px;
-        }
+.emoji-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
+}
 
-        .gallery-container {
-            width: 95%;
-            max-width: 1200px;
-            height: 80vh;
-            background: rgba(255, 255, 255, 0.6); 
-            border-radius: 40px;
-            box-shadow: var(--shadow-xl);
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(15px);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-        }
-        
-        .gallery-container::after {
-            content: '';
-            position: absolute;
-            top: 10px; left: 10px; right: 10px; bottom: 10px;
-            border: 2px dashed rgba(0, 175, 63, 0.2);
-            border-radius: 32px;
-            pointer-events: none;
-        }
+.input-container {
+    width: 100%;
+    max-width: 650px;
+    background: var(--parchment);
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: var(--shadow-xl);
+}
 
-        .canvas-area {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            overflow: hidden;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(85,198,217,0.05) 0%, transparent 20%),
-                radial-gradient(circle at 80% 70%, rgba(0,175,63,0.05) 0%, transparent 25%);
-        }
+textarea {
+    width: 100%;
+    height: 140px;
+    resize: none;
+    padding: 20px;
+    border-radius: 18px;
+    border: 2px solid #ddd;
+    font-size: 17px;
+    line-height: 1.6;
+    background: rgba(255,255,255,.9);
+}
 
-        .message-card {
-            position: absolute;
-            background: var(--card-rock); 
-            border-radius: 60px 40px 70px 50px / 50px 70px 40px 60px;
-            padding: 20px 25px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            user-select: none;
-            word-wrap: break-word;
-            border: 3px solid #D7D7D0; 
-            width: 240px;
-            height: 170px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        
-        .message-card:hover {
-            box-shadow: 0 15px 35px rgba(0, 175, 63, 0.25); 
-            border-color: var(--p360-green);
-        }
+textarea:focus {
+    outline: none;
+    border-color: var(--p360-green);
+}
 
-        .card-number {
-            position: absolute;
-            top: 12px;
-            left: 18px;
-            font-size: 14px;
-            color: rgba(0, 0, 0, 0.3);
-            font-weight: 800;
-        }
+.char-count {
+    text-align: right;
+    margin-top: 8px;
+    color: rgba(44,62,80,.65);
+}
 
-        .message-emoji {
-            font-size: 32px;
-            margin-bottom: 8px;
-            display: block;
-        }
+.btn-submit {
+    width: 100%;
+    margin-top: 18px;
+    padding: 16px;
+    border-radius: 999px;
+    background: var(--button-gradient);
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+}
 
-        .message-text {
-            color: #333333; 
-            font-weight: 500;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 3; 
-            -webkit-box-orient: vertical;
-            line-height: 1.5;
-        }
+#step3 {
+    background:
+        radial-gradient(circle at 72% 18%, rgba(85,198,217,.26), transparent 26%),
+        linear-gradient(140deg, #D7F2EC 0%, #E9F7EA 42%, #B9DCD9 100%);
+    padding: clamp(18px, 3vw, 38px);
+    overflow: hidden;
+}
 
-        .next-btn {
-            position: absolute;
-            bottom: 40px;
-            right: 40px;
-            padding: 15px 30px;
-            background: var(--button-gradient);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 16px;
-            z-index: 100;
-            box-shadow: 0 5px 15px rgba(0, 175, 63, 0.3);
-            transition: 0.3s;
-        }
+.wall-shell {
+    width: min(1500px, 96vw);
+    height: min(860px, 88vh);
+    display: grid;
+    grid-template-columns: minmax(220px, 330px) minmax(0, 1fr);
+    gap: clamp(18px, 3vw, 36px);
+    align-items: stretch;
+}
 
-        .next-btn:hover {
-            transform: translateY(-3px) scale(1.03);
-            box-shadow: 0 10px 25px rgba(85,198,217,0.4);
-        }
+.wall-aside {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(24px, 3vw, 42px) 0;
+    color: var(--river-night);
+}
 
-        /* ===== STEP4 隨機祝福頁面 ===== */
-        #step4 {
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: var(--primary-gradient);
-            padding: 40px;
-            text-align: center;
-        }
+.wall-kicker {
+    writing-mode: vertical-rl;
+    align-self: flex-start;
+    font-size: 14px;
+    letter-spacing: .18em;
+    color: rgba(23,61,69,.58);
+}
 
-        .blessing-container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 60px;
-            border-radius: 40px;
-            box-shadow: var(--shadow-xl);
-            max-width: 700px;
-            width: 90%;
-            border: 4px double var(--p325-cyan);
-            animation: slideInUp 1s ease-out;
-        }
+.wall-title {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    align-self: center;
+    max-height: 66vh;
+    font-size: clamp(34px, 5vw, 68px);
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: .08em;
+}
 
-        .blessing-title {
-            font-family: "Microsoft JhengHei", serif;
-            font-size: 24px;
-            color: var(--p360-green);
-            margin-bottom: 30px;
-            letter-spacing: 4px;
-            font-weight: bold;
-        }
+.wall-meta {
+    width: 100%;
+    display: grid;
+    gap: 12px;
+    font-size: 14px;
+    color: rgba(23,61,69,.7);
+}
 
-        #blessing-text {
-            font-family: "Microsoft JhengHei", serif;
-            font-size: 32px;
-            color: var(--text-dark);
-            line-height: 1.8;
-            margin-bottom: 40px;
-            font-weight: 700;
-        }
+.wall-meta span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background: linear-gradient(90deg, var(--river-deep), rgba(27,111,121,0));
+}
 
-        .btn-restart {
-            background: var(--p360-green);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-size: 18px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
+.gallery-container {
+    min-width: 0;
+    height: 100%;
+    background:
+        linear-gradient(110deg, rgba(255,255,255,.58), rgba(255,255,255,.28)),
+        linear-gradient(180deg, rgba(85,198,217,.16), rgba(0,175,63,.12));
+    border: 1px solid rgba(255,255,255,.72);
+    border-radius: 28px;
+    overflow: hidden;
+    position: relative;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 24px 70px rgba(21,91,101,.22);
+}
 
-        .btn-restart:hover {
-            background: var(--p325-cyan);
-            transform: scale(1.05);
-        }
+.gallery-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        repeating-linear-gradient(100deg, rgba(255,255,255,.16) 0 2px, transparent 2px 52px),
+        radial-gradient(ellipse at 50% 102%, rgba(92,118,76,.32), transparent 45%);
+    mix-blend-mode: screen;
+    opacity: .7;
+}
 
-        /* ===== 手機版介面適配 (響應式) ===== */
-        @media (max-width: 768px) {
-            #cover { padding: 40px 20px; text-align: center; }
-            .cover-title { font-size: 40px; margin-top: 20px; }
-            .cover-subtitle { font-size: 16px; margin-bottom: 30px; }
-            .cover-preview { grid-template-columns: 1fr 1fr; padding-left: 0; width: 100%; max-width: 350px; margin-top: 30px; }
-            .preview-item { font-size: 60px; }
-            
-            #step1, #step2 { padding: 40px 20px; }
-            .step-title { font-size: 28px; margin-bottom: 30px; }
-            .emoji-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
-            .emoji-card { font-size: 60px; border-radius: 20px; }
-            
-            .input-container { padding: 30px 20px; }
-            .step2-title { font-size: 20px; }
-            textarea { height: 110px; font-size: 16px; }
-            
-            .gallery-container { height: 75vh; border-radius: 30px; }
-            .next-btn { bottom: 25px; right: 25px; padding: 12px 20px; font-size: 14px; }
-            
-            /* 手機版縮小石頭尺寸 */
-            .message-card { 
-                width: 130px; 
-                height: 90px; 
-                padding: 10px; 
-                border-radius: 30px 20px 40px 25px / 25px 40px 20px 35px; 
-            }
-            .message-emoji { font-size: 20px; margin-bottom: 4px; }
-            .message-text { font-size: 12px; -webkit-line-clamp: 2; line-height: 1.4; }
-            .card-number { top: 8px; left: 12px; font-size: 10px; }
-            
-            .blessing-container { padding: 40px 20px; }
-            #blessing-text { font-size: 22px; }
-        }
-    </style>
+.canvas-area {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.canvas-area::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(90deg, rgba(255,255,255,.18), transparent 32%, rgba(255,255,255,.13) 68%, transparent),
+        repeating-radial-gradient(ellipse at 50% 120%, rgba(32,91,84,.18) 0 2px, transparent 2px 28px);
+    animation: waterSweep 10s linear infinite;
+    z-index: 0;
+}
+
+.canvas-empty {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(23,61,69,.72);
+    font-size: clamp(18px, 2vw, 25px);
+    z-index: 2;
+}
+
+@keyframes waterSweep {
+    from { background-position: 0 0, 0 0; }
+    to { background-position: 240px 0, 0 48px; }
+}
+
+.message-card {
+    position: absolute;
+    width: 230px;
+    min-height: 154px;
+    padding: 22px 20px 20px;
+    border-radius: 28px 32px 25px 35px;
+    background:
+        radial-gradient(circle at 18% 16%, rgba(255,255,255,.92), rgba(255,255,255,0) 30%),
+        linear-gradient(145deg, #F2F1EA, #CFCDBE 58%, #B8B5A3 100%);
+    box-shadow:
+        inset -10px -12px 24px rgba(78,76,60,.15),
+        inset 10px 12px 20px rgba(255,255,255,.42),
+        0 14px 26px rgba(28,63,58,.2);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    will-change: transform, left, top;
+    z-index: 2;
+    user-select: none;
+}
+
+.message-card::after {
+    content: "";
+    position: absolute;
+    inset: 9px;
+    border-radius: inherit;
+    border: 1px solid rgba(255,255,255,.32);
+    pointer-events: none;
+}
+
+.card-number {
+    position: absolute;
+    top: 13px;
+    left: 18px;
+    font-size: 12px;
+    color: rgba(38,52,48,.38);
+}
+
+.message-emoji {
+    font-size: 34px;
+    line-height: 1;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,.12));
+}
+
+.message-text {
+    width: 100%;
+    color: #34433F;
+    line-height: 1.5;
+    font-size: 16px;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.next-btn {
+    position: absolute;
+    right: 26px;
+    bottom: 24px;
+    padding: 15px 28px;
+    border-radius: 999px;
+    background: var(--button-gradient);
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 12px 28px rgba(0,90,90,.22);
+    z-index: 4;
+}
+
+#step4 {
+    background: var(--primary-gradient);
+}
+
+.blessing-container {
+    width: 90%;
+    max-width: 700px;
+    background: rgba(255, 255, 255, .96);
+    padding: 60px;
+    border-radius: 34px;
+    text-align: center;
+    box-shadow: var(--shadow-xl);
+}
+
+.blessing-title {
+    color: var(--p360-green);
+    margin-bottom: 30px;
+    font-size: 24px;
+}
+
+#blessing-text {
+    font-size: 32px;
+    line-height: 1.8;
+    margin-bottom: 40px;
+}
+
+.btn-restart {
+    padding: 16px 36px;
+    border-radius: 999px;
+    background: var(--p360-green);
+    color: white;
+    font-weight: 700;
+}
+
+@media (max-width: 900px) {
+    #cover {
+        padding: 40px 20px;
+        text-align: center;
+    }
+
+    .cover-preview {
+        margin-top: 30px;
+    }
+
+    .preview-item {
+        font-size: 60px;
+        border-radius: 24px;
+    }
+
+    .step-title {
+        font-size: 26px;
+        text-align: center;
+    }
+
+    .emoji-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .emoji-card {
+        font-size: 60px;
+        border-radius: 22px;
+    }
+
+    .wall-shell {
+        height: 92vh;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .wall-aside {
+        min-height: auto;
+        flex-direction: row;
+        align-items: end;
+        padding: 0 4px;
+    }
+
+    .wall-kicker,
+    .wall-title {
+        writing-mode: horizontal-tb;
+        text-orientation: initial;
+    }
+
+    .wall-title {
+        font-size: 28px;
+        line-height: 1.2;
+        letter-spacing: 0;
+    }
+
+    .wall-meta {
+        display: none;
+    }
+
+    .gallery-container {
+        border-radius: 22px;
+    }
+
+    .message-card {
+        width: 132px;
+        min-height: 92px;
+        padding: 12px 10px 10px;
+        border-radius: 18px 21px 16px 20px;
+    }
+
+    .card-number {
+        top: 7px;
+        left: 10px;
+        font-size: 10px;
+    }
+
+    .message-emoji {
+        font-size: 20px;
+        margin-bottom: 5px;
+    }
+
+    .message-text {
+        font-size: 12px;
+        line-height: 1.35;
+        -webkit-line-clamp: 2;
+    }
+
+    .next-btn {
+        right: 16px;
+        bottom: 16px;
+        padding: 12px 20px;
+    }
+
+    .input-container,
+    .blessing-container {
+        padding: 32px 22px;
+        border-radius: 24px;
+    }
+
+    #blessing-text {
+        font-size: 22px;
+    }
+}
+</style>
 </head>
 <body>
-    <div id="cover" class="page active">
-        <div class="cover-content">
-            <div class="cover-title">美崙溪記憶之牆</div>
-            <div class="cover-subtitle">寫下你與這片水域的故事<br>讓每一抹思緒，化作水文間的洄盪</div>
-            <button id="btn-start" class="btn-start">潛入溪流</button>
+<div id="cover" class="page active">
+    <div class="cover-content">
+        <div class="cover-title">河川記憶</div>
+        <div class="cover-subtitle">
+            寫下你與這片水域的故事<br />
+            讓每一抹思緒，化作水文間的洄盪
         </div>
-        <div class="cover-preview">
-            <div class="preview-item">🐟</div>
-            <div class="preview-item">🌿</div>
-            <div class="preview-item">⛰️</div>
-            <div class="preview-item">💧</div>
-        </div>
+        <button id="btn-start" class="btn-start">潛入溪流</button>
     </div>
-
-    <div id="step1" class="page">
-        <div class="step-title">請選擇代表你的溪流生靈</div>
-        <div class="emoji-grid">
-            <div class="emoji-card" data-emoji="🐟">🐟</div>
-            <div class="emoji-card" data-emoji="🌿">🌿</div>
-            <div class="emoji-card" data-emoji="⛰️">⛰️</div>
-            <div class="emoji-card" data-emoji="💧">💧</div>
-        </div>
+    <div class="cover-preview" aria-hidden="true">
+        <div class="preview-item">魚</div>
+        <div class="preview-item">草</div>
+        <div class="preview-item">山</div>
+        <div class="preview-item">水</div>
     </div>
+</div>
 
-    <div id="step2" class="page">
-        <div class="input-container">
-            <div id="selectedEmojiDisplay" style="font-size: 70px; text-align: center; margin-bottom: 20px;"></div>
-            <div class="step-title" style="font-size: 24px; margin-bottom: 20px; text-align: center;">你想對美崙溪說些什麼？</div>
-            <textarea id="messageInput" placeholder="分享你的風景或回憶..." maxlength="50"></textarea>
-            <div class="char-count"><span id="charCount">0</span>/50</div>
-            <button id="btn-submit" class="btn-submit">投入水中</button>
-        </div>
+<div id="step1" class="page">
+    <div class="step-title">請選擇代表你的溪流生靈</div>
+    <div class="emoji-grid">
+        <div class="emoji-card" data-emoji="魚">魚</div>
+        <div class="emoji-card" data-emoji="草">草</div>
+        <div class="emoji-card" data-emoji="山">山</div>
+        <div class="emoji-card" data-emoji="水">水</div>
     </div>
+</div>
 
-    <div id="step3" class="page">
+<div id="step2" class="page">
+    <div class="input-container">
+        <div id="selectedEmojiDisplay" style="font-size:70px;text-align:center;margin-bottom:20px;"></div>
+        <div class="step-title" style="font-size:24px;text-align:center;margin-bottom:20px;">你想對我們說些什麼？</div>
+        <textarea id="messageInput" maxlength="50" placeholder="分享你現在的心境與感想..."></textarea>
+        <div class="char-count"><span id="charCount">0</span>/50</div>
+        <button id="btn-submit" class="btn-submit">投入水中</button>
+    </div>
+</div>
+
+<div id="step3" class="page">
+    <div class="wall-shell">
+        <aside class="wall-aside">
+            <div class="wall-kicker">ForMoSac</div>
+            <div class="wall-title">美崙溪記憶水路</div>
+            <div class="wall-meta">
+                <span></span>
+                <p>Hualien Meilun River</p>
+            </div>
+        </aside>
         <div class="gallery-container">
             <div class="canvas-area" id="canvasArea"></div>
             <button id="btn-to-blessing" class="next-btn">重返岸邊</button>
         </div>
     </div>
+</div>
 
-    <div id="step4" class="page">
-        <div class="blessing-container">
-            <div class="blessing-title">—— 溪流的迴響 ——</div>
-            <div id="blessing-text">願你的生活如美崙溪般生生不息。</div>
-            <button id="btn-final-restart" class="btn-restart">再次開啟旅程</button>
-        </div>
+<div id="step4" class="page">
+    <div class="blessing-container">
+        <div class="blessing-title">溪流的迴響</div>
+        <div id="blessing-text">願你的生活如美崙溪般生生不息。</div>
+        <button id="btn-final-restart" class="btn-restart">再次開啟旅程</button>
     </div>
+</div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    query,
+    orderBy,
+    limit,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Firebase 連線金鑰
-        const firebaseConfig = {
-            apiKey: "AIzaSyAk7_r7HGijcFBzTjameuieXoSCrBwrg0g",
-            authDomain: "uuu566-ec42d.firebaseapp.com",
-            projectId: "uuu566-ec42d",
-            storageBucket: "uuu566-ec42d.firebasestorage.app",
-            messagingSenderId: "148385432205",
-            appId: "1:148385432205:web:5055eaaab6206e8c6b98c4",
-            measurementId: "G-215P1M3NYL"
-        };
+const firebaseConfig = {
+    apiKey: "AIzaSyAk7_r7HGijcFBzTjameuieXoSCrBwrg0g",
+    authDomain: "uuu566-ec42d.firebaseapp.com",
+    projectId: "uuu566-ec42d",
+    storageBucket: "uuu566-ec42d.appspot.com",
+    messagingSenderId: "148385432205",
+    appId: "1:148385432205:web:5055eaaab6206e8c6b98c4"
+};
 
-        const firebaseApp = initializeApp(firebaseConfig);
-        const db = getFirestore(firebaseApp);
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
 
-        // 10 句專屬祝福語
-        const blessings = [
-            "願你的生活如美崙溪般生生不息。",
-            "願溪水洗滌憂愁，帶回內心的寧靜。",
-            "願你在生活的每個角落，都能遇見屬於自己的湧泉。",
-            "根深葉茂，願你如河岸森林般韌性生長。",
-            "如狐蝠尋得棲林，願你也找到心之所向的歸屬。",
-            "清流潤心，願你的前程如溪水般明亮透徹。",
-            "山高水長，願你歲月靜好，平安喜樂。",
-            "如溪匯海，願你所有的努力終能成就壯闊。",
-            "積蓄山澗之力，勇敢跨越每一道生命的轉折。",
-            "每一顆石子都有故事，每一段生命都有光芒。"
-        ];
+const blessings = [
+    "願你的生活如美崙溪般生生不息。",
+    "願溪水洗滌憂愁，帶回內心的寧靜。",
+    "願你在生活的每個角落，都能遇見屬於自己的湧泉。",
+    "根深葉茂，願你如河岸森林般韌性生長。",
+    "如狐蝠尋得棲林，願你也找到心之所向的歸屬。",
+    "清流潤心，願你的前程如溪水般明亮透徹。",
+    "山高水長，願你歲月靜好，平安喜樂。",
+    "如溪匯海，願你所有的努力終能成就壯闊。",
+    "積蓄山澗之力，勇敢跨越每一道生命的轉折。",
+    "每一顆石子都有故事，每一段生命都有光芒。",
+    "今天你睡了嗎。",
+    "你知道新秀展到6月1號結束嗎。",
+    "塊陶。",
+    "做設計當作出去玩散散心。",
+    "你再繼續焦慮你會燒焦。",
+    "謝謝今天過來留言，祝福您今天都是綠燈通行順順利利。"
+];
 
-        // 物理碰撞引擎
-        class PhysicsCard {
-            constructor(emoji, message, x, y, cw, ch) {
-                this.emoji = emoji; 
-                this.message = message;
-                this.x = x; 
-                this.y = y;
-                this.vx = (Math.random() - 0.5) * 6; 
-                this.vy = Math.random();
-                this.rot = Math.random() * 20 - 10; 
-                this.rv = (Math.random() - 0.5) * 0.12;
-                
-                // 動態判斷手機或電腦，調整碰撞箱尺寸，必須與 CSS 尺寸一致
-                const isMobile = window.innerWidth <= 768;
-                this.w = isMobile ? 130 : 240; 
-                this.h = isMobile ? 90 : 170;
-                
-                this.grav = 0.35; 
-                this.fric = 0.99; 
-                this.bounce = 0.65;
-                this.isRest = false; 
-                this.cw = cw; 
-                this.ch = ch; 
-                this.el = null;
-            }
+const fallbackMessages = [
+    { emoji: "水", message: "今天的水聲很安靜。" },
+    { emoji: "草", message: "希望河岸一直是柔軟的。" },
+    { emoji: "山", message: "從山到海都有人記得。" },
+    { emoji: "魚", message: "願每次回游都有路。" },
+    { emoji: "水", message: "把焦慮放進溪裡。" },
+    { emoji: "草", message: "願生活慢慢發芽。" }
+];
 
-            update(cards) {
-                if (this.isRest) return;
-                
-                this.vy += this.grav; 
-                this.x += this.vx; 
-                this.y += this.vy;
-                this.vx *= this.fric; 
-                this.vy *= this.fric;
-                this.rot += this.rv;
-                
-                // 碰到左右牆壁反彈
-                if (this.x < 0) { 
-                    this.x = 0; 
-                    this.vx = Math.abs(this.vx) * this.bounce; 
-                }
-                if (this.x + this.w > this.cw) { 
-                    this.x = this.cw - this.w; 
-                    this.vx = -Math.abs(this.vx) * this.bounce; 
-                }
-                
-                // 石頭互相碰撞
-                for (let card of cards) {
-                    if (card === this) continue;
-                    if (this.checkCollisionAABB(card)) {
-                        this.resolveCollision(card);
-                    }
-                }
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#039;"
+    }[char]));
+}
 
-                // 觸底判斷
-                if (this.y + this.h >= this.ch) {
-                    this.y = this.ch - this.h; 
-                    this.vy *= -this.bounce;
-                    // 當速度夠低時視為靜止
-                    if (Math.abs(this.vy) < 1.5 && Math.abs(this.vx) < 1.0) {
-                        this.isRest = true;
-                    }
-                }
-            }
+class PhysicsCard {
+    constructor(emoji, message, x, y, cw, ch, index) {
+        const mobile = window.innerWidth <= 900;
+        this.emoji = emoji;
+        this.message = message;
+        this.x = x;
+        this.y = y;
+        this.w = mobile ? 132 : 230;
+        this.h = mobile ? 92 : 154;
+        this.vx = (Math.random() - .5) * 5.2;
+        this.vy = Math.random() * .8;
+        this.rot = Math.random() * 22 - 11;
+        this.rv = (Math.random() - .5) * .22;
+        this.mass = 1 + Math.random() * .3;
+        this.grav = mobile ? .34 : .42;
+        this.air = .985;
+        this.surfaceFriction = .86;
+        this.bounce = .16;
+        this.cw = cw;
+        this.ch = ch;
+        this.sleepFrames = 0;
+        this.isRest = false;
+        this.index = index;
+    }
 
-            checkCollisionAABB(other) {
-                return !(this.x + this.w < other.x ||
-                         this.x > other.x + other.w ||
-                         this.y + this.h < other.y ||
-                         this.y > other.y + other.h);
-            }
+    tick(cards) {
+        if (this.isRest) return;
 
-            resolveCollision(other) {
-                const overlapLeft = (this.x + this.w) - other.x;
-                const overlapRight = (other.x + other.w) - this.x;
-                const overlapTop = (this.y + this.h) - other.y;
-                const overlapBottom = (other.y + other.h) - this.y;
+        this.vy += this.grav;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vx *= this.air;
+        this.vy *= this.air;
+        this.rot += this.rv;
+        this.rv *= .94;
 
-                const minOverlapX = Math.min(overlapLeft, overlapRight);
-                const minOverlapY = Math.min(overlapTop, overlapBottom);
+        this.keepInside();
 
-                if (minOverlapX < minOverlapY) {
-                    if (overlapLeft < overlapRight) {
-                        this.x = other.x - this.w;
-                        this.vx = -Math.abs(this.vx) * this.bounce;
-                        other.vx = Math.abs(other.vx) * this.bounce;
-                    } else {
-                        this.x = other.x + other.w;
-                        this.vx = Math.abs(this.vx) * this.bounce;
-                        other.vx = -Math.abs(other.vx) * this.bounce;
-                    }
-                } else {
-                    if (overlapTop < overlapBottom) {
-                        this.y = other.y - this.h;
-                        this.vy = -Math.abs(this.vy) * this.bounce;
-                        other.vy = Math.abs(other.vy) * this.bounce;
-                    } else {
-                        this.y = other.y + other.h;
-                        this.vy = Math.abs(this.vy) * this.bounce;
-                        other.vy = -Math.abs(other.vy) * this.bounce;
-                    }
-                }
-                this.rv += (this.vx - other.vx) * 0.02;
+        for (let i = 0; i < 4; i += 1) {
+            for (const other of cards) {
+                if (other === this) continue;
+                this.resolveCollision(other);
             }
         }
 
-        // 應用程式狀態管理
-        const app = {
-            currentEmoji: null,
-            cards: [],
-            isSubmitting: false,
-            
-            init() {
-                this.bindEvents();
-                this.animate();
-            },
-            
-            bindEvents() {
-                // 綁定各個按鈕的點擊事件
-                document.getElementById('btn-start').onclick = () => this.goToStep(1);
-                
-                document.querySelectorAll('.emoji-card').forEach(card => {
-                    card.onclick = (e) => this.selectEmoji(e.currentTarget.dataset.emoji);
-                });
-                
-                document.getElementById('messageInput').oninput = () => this.updateCharCount();
-                document.getElementById('btn-submit').onclick = () => this.submitMessage();
-                
-                // 第三頁點擊「重返岸邊」，隨機抽出祝福語，並前往第四頁
-                document.getElementById('btn-to-blessing').onclick = () => {
-                    const randomIdx = Math.floor(Math.random() * blessings.length);
-                    document.getElementById('blessing-text').textContent = blessings[randomIdx];
-                    this.goToStep(4);
-                };
+        this.checkSleep();
+    }
 
-                // 第四頁點擊「再次開啟旅程」，回到首頁
-                document.getElementById('btn-final-restart').onclick = () => this.goToStep(0);
-            },
-            
-            goToStep(step) {
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                
-                if (step === 0) {
-                    document.getElementById('cover').classList.add('active');
-                } else {
-                    document.getElementById('step' + step).classList.add('active');
+    keepInside() {
+        if (this.x < 0) {
+            this.x = 0;
+            this.vx = Math.abs(this.vx) * this.bounce;
+        }
+
+        if (this.x + this.w > this.cw) {
+            this.x = this.cw - this.w;
+            this.vx = -Math.abs(this.vx) * this.bounce;
+        }
+
+        if (this.y < -260) {
+            this.y = -260;
+            this.vy = Math.max(this.vy, 0);
+        }
+
+        if (this.y + this.h >= this.ch) {
+            this.y = this.ch - this.h;
+            this.vy = -Math.abs(this.vy) * this.bounce;
+            this.vx *= this.surfaceFriction;
+            this.rv *= .74;
+        }
+    }
+
+    resolveCollision(other) {
+        const ax = this.x + this.w / 2;
+        const ay = this.y + this.h / 2;
+        const bx = other.x + other.w / 2;
+        const by = other.y + other.h / 2;
+        const dx = ax - bx;
+        const dy = ay - by;
+        const overlapX = (this.w + other.w) / 2 - Math.abs(dx);
+        const overlapY = (this.h + other.h) / 2 - Math.abs(dy);
+
+        if (overlapX <= 0 || overlapY <= 0) return;
+
+        const axisX = overlapX < overlapY;
+        const dir = axisX ? Math.sign(dx || .01) : Math.sign(dy || .01);
+        const push = axisX ? overlapX : overlapY;
+        const totalMass = this.mass + other.mass;
+        const thisShare = other.mass / totalMass;
+        const otherShare = this.mass / totalMass;
+        const slop = .8;
+        const correction = Math.max(0, push - slop);
+
+        if (axisX) {
+            this.x += dir * correction * thisShare;
+            other.x -= dir * correction * otherShare;
+            const impulse = (this.vx - other.vx) * .22;
+            this.vx -= impulse;
+            other.vx += impulse;
+        } else {
+            this.y += dir * correction * thisShare;
+            other.y -= dir * correction * otherShare;
+            const impulse = (this.vy - other.vy) * .18;
+            this.vy -= impulse;
+            other.vy += impulse;
+            this.vx += dir * .05;
+            other.vx -= dir * .05;
+        }
+
+        this.rv += dir * .006;
+        other.rv -= dir * .006;
+        this.isRest = false;
+        other.isRest = false;
+        this.sleepFrames = 0;
+        other.sleepFrames = 0;
+        this.keepInside();
+        other.keepInside();
+    }
+
+    checkSleep() {
+        const onFloor = this.y + this.h >= this.ch - .75;
+        const calm = Math.abs(this.vx) < .055 && Math.abs(this.vy) < .08 && Math.abs(this.rv) < .004;
+
+        if (onFloor && calm) {
+            this.sleepFrames += 1;
+        } else {
+            this.sleepFrames = 0;
+        }
+
+        if (this.sleepFrames > 42) {
+            this.isRest = true;
+            this.vx = 0;
+            this.vy = 0;
+            this.rv = 0;
+        }
+    }
+}
+
+const app = {
+    currentEmoji: null,
+    cards: [],
+    isSubmitting: false,
+    wallToken: 0,
+
+    init() {
+        this.bind();
+        this.animate();
+    },
+
+    bind() {
+        document.getElementById("btn-start").onclick = () => this.go(1);
+
+        document.querySelectorAll(".emoji-card").forEach(card => {
+            card.onclick = event => this.selectEmoji(event.currentTarget.dataset.emoji);
+        });
+
+        document.getElementById("messageInput").oninput = () => this.updateCount();
+        document.getElementById("btn-submit").onclick = () => this.submit();
+        document.getElementById("btn-to-blessing").onclick = () => this.showBlessing();
+        document.getElementById("btn-final-restart").onclick = () => this.go(0);
+
+        window.addEventListener("resize", () => this.resizeCards());
+    },
+
+    go(step) {
+        document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+        const target = step === 0 ? "cover" : "step" + step;
+        document.getElementById(target).classList.add("active");
+
+        if (step === 3) {
+            this.fetchWall();
+        }
+    },
+
+    selectEmoji(emoji) {
+        this.currentEmoji = emoji;
+        document.getElementById("selectedEmojiDisplay").textContent = emoji;
+        this.go(2);
+    },
+
+    updateCount() {
+        document.getElementById("charCount").textContent = document.getElementById("messageInput").value.length;
+    },
+
+    async submit() {
+        if (this.isSubmitting) return;
+
+        const input = document.getElementById("messageInput");
+        const text = input.value.trim();
+
+        if (!text || !this.currentEmoji) return;
+
+        this.isSubmitting = true;
+
+        const btn = document.getElementById("btn-submit");
+        btn.textContent = "投入溪流中...";
+
+        try {
+            await addDoc(collection(db, "messages"), {
+                emoji: this.currentEmoji,
+                message: text,
+                timestamp: serverTimestamp()
+            });
+        } catch (err) {
+            console.warn("Firebase write failed, rendering locally.", err);
+            fallbackMessages.push({
+                emoji: this.currentEmoji,
+                message: text
+            });
+        }
+
+        input.value = "";
+        this.updateCount();
+        btn.textContent = "投入水中";
+        this.isSubmitting = false;
+        this.go(3);
+    },
+
+    showBlessing() {
+        const idx = Math.floor(Math.random() * blessings.length);
+        document.getElementById("blessing-text").innerText = blessings[idx];
+        this.go(4);
+    },
+
+    async fetchWall() {
+        const token = ++this.wallToken;
+        const canvas = document.getElementById("canvasArea");
+        canvas.innerHTML = '<div class="canvas-empty">水文記憶撈取中...</div>';
+        this.cards = [];
+
+        let data = [];
+
+        try {
+            const q = query(collection(db, "messages"), orderBy("timestamp", "desc"), limit(24));
+            const snap = await getDocs(q);
+            snap.forEach(doc => data.push(doc.data()));
+            data.reverse();
+        } catch (err) {
+            console.warn("Firebase read failed, using fallback messages.", err);
+        }
+
+        if (!data.length) {
+            data = fallbackMessages;
+        }
+
+        if (token !== this.wallToken) return;
+
+        canvas.innerHTML = "";
+        this.dropCards(data);
+    },
+
+    dropCards(data) {
+        const canvas = document.getElementById("canvasArea");
+        const cw = canvas.offsetWidth;
+        const ch = canvas.offsetHeight;
+        const mobile = window.innerWidth <= 900;
+        const cardWidth = mobile ? 132 : 230;
+        const gutter = mobile ? 12 : 24;
+
+        data.forEach((item, i) => {
+            setTimeout(() => {
+                if (!document.getElementById("step3").classList.contains("active")) return;
+
+                const spread = Math.max(gutter, cw - cardWidth - gutter * 2);
+                const startX = gutter + ((i * (cardWidth * .72)) % spread);
+                const jitter = (Math.random() - .5) * Math.min(120, spread * .18);
+                const card = new PhysicsCard(
+                    item.emoji || "水",
+                    item.message || "",
+                    Math.max(gutter, Math.min(cw - cardWidth - gutter, startX + jitter)),
+                    -190 - Math.random() * 90,
+                    cw,
+                    ch,
+                    i
+                );
+
+                const el = document.createElement("div");
+                el.className = "message-card";
+                el.innerHTML = `
+                    <div class="card-number">#${i + 1}</div>
+                    <div class="message-emoji">${escapeHTML(card.emoji)}</div>
+                    <div class="message-text">${escapeHTML(card.message)}</div>
+                `;
+
+                canvas.appendChild(el);
+                card.el = el;
+                this.cards.push(card);
+            }, i * 160);
+        });
+    },
+
+    resizeCards() {
+        const canvas = document.getElementById("canvasArea");
+        if (!canvas || !this.cards.length) return;
+
+        const cw = canvas.offsetWidth;
+        const ch = canvas.offsetHeight;
+        const mobile = window.innerWidth <= 900;
+
+        this.cards.forEach(card => {
+            card.cw = cw;
+            card.ch = ch;
+            card.w = mobile ? 132 : 230;
+            card.h = mobile ? 92 : 154;
+            card.x = Math.min(card.x, Math.max(0, cw - card.w));
+            card.y = Math.min(card.y, Math.max(0, ch - card.h));
+            card.isRest = false;
+            card.sleepFrames = 0;
+        });
+    },
+
+    animate() {
+        if (document.getElementById("step3").classList.contains("active")) {
+            this.cards.forEach(card => {
+                card.tick(this.cards);
+
+                if (card.el) {
+                    card.el.style.left = `${card.x}px`;
+                    card.el.style.top = `${card.y}px`;
+                    card.el.style.transform = `rotate(${card.rot}deg)`;
                 }
-                
-                // 如果切換到牆壁頁面，去資料庫抓資料
-                if (step === 3) this.fetchWall();
-            },
-            
-            selectEmoji(emoji) {
-                this.currentEmoji = emoji;
-                document.getElementById('selectedEmojiDisplay').textContent = emoji;
-                this.goToStep(2);
-            },
+            });
+        }
 
-            updateCharCount() {
-                const count = document.getElementById('messageInput').value.length;
-                document.getElementById('charCount').textContent = count;
-            },
-            
-            async submitMessage() {
-                if (this.isSubmitting) return;
-                const text = document.getElementById('messageInput').value.trim();
-                if (!text || !this.currentEmoji) return;
-                
-                this.isSubmitting = true;
-                const submitBtn = document.getElementById('btn-submit');
-                submitBtn.textContent = '投入溪流中...';
+        requestAnimationFrame(() => this.animate());
+    }
+};
 
-                try {
-                    await addDoc(collection(db, "messages"), {
-                        emoji: this.currentEmoji, 
-                        message: text, 
-                        timestamp: Date.now()
-                    });
-                    
-                    document.getElementById('messageInput').value = '';
-                    this.updateCharCount();
-                    this.isSubmitting = false;
-                    submitBtn.textContent = '投入水中';
-                    this.goToStep(3);
-                } catch (e) { 
-                    alert('連線失敗，請檢查網路。'); 
-                    this.isSubmitting = false;
-                    submitBtn.textContent = '投入水中';
-                }
-            },
-            
-            async fetchWall() {
-                const canvas = document.getElementById('canvasArea');
-                canvas.innerHTML = '<div style="color:var(--text-dark); text-align:center; padding-top:50px; font-size:24px; font-weight:bold;">水文記憶撈取中...</div>';
-                this.cards = [];
-                
-                try {
-                    const q = query(collection(db, "messages"), orderBy("timestamp", "desc"), limit(20));
-                    const snap = await getDocs(q);
-                    const data = [];
-                    snap.forEach(doc => data.push(doc.data()));
-                    data.reverse(); // 為了讓最新的在最後掉下來
-                    
-                    canvas.innerHTML = '';
-                    const cw = canvas.offsetWidth, ch = canvas.offsetHeight;
-                    const isMobile = window.innerWidth <= 768;
-                    const cardWidth = isMobile ? 130 : 240;
-
-                    data.forEach((d, i) => {
-                        setTimeout(() => {
-                            const card = new PhysicsCard(d.emoji, d.message, Math.random()*(cw - cardWidth), -200, cw, ch);
-                            const el = document.createElement('div');
-                            el.className = 'message-card';
-                            // 加入石塊斑駁的背景效果
-                            el.style.background = `var(--card-rock) radial-gradient(circle at ${Math.random()*100}% ${Math.random()*100}%, rgba(0,0,0,0.03) 0%, transparent 10%)`;
-                            
-                            el.innerHTML = `
-                                <div class="card-number">#${i + 1}</div>
-                                <span class="message-emoji">${card.emoji}</span>
-                                <div class="message-text">${card.message}</div>
-                            `;
-                            
-                            canvas.appendChild(el);
-                            card.el = el;
-                            this.cards.push(card);
-                        }, i * 200); // 製造時間差掉落效果
-                    });
-                } catch (e) { 
-                    canvas.innerHTML = '<div style="color:var(--text-dark); text-align:center; padding-top:50px; font-size:20px;">載入失敗，天地失序。</div>'; 
-                }
-            },
-            
-            animate() {
-                // 只有在處於第三頁(動態牆)時才去更新畫布，節省效能
-                if (document.getElementById('step3').classList.contains('active')) {
-                    this.cards.forEach(c => {
-                        c.update(this.cards);
-                        if (c.el) {
-                            c.el.style.left = c.x + 'px';
-                            c.el.style.top = c.y + 'px';
-                            c.el.style.transform = `rotate(${c.rot}deg)`;
-                        }
-                    });
-                }
-                requestAnimationFrame(() => this.animate());
-            }
-        };
-
-        // 啟動應用程式
-        app.init();
-    </script>
+app.init();
+</script>
 </body>
 </html>
