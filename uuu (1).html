@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>互動動態留言牆</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.15);
+            --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            overflow: hidden;
+            background: #f8f9fb;
+        }
+
+        /* ===== 頁面容器 ===== */
+        .page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+        }
+
+        .page.active {
+            display: flex;
+            opacity: 1;
+            z-index: 10;
+        }
+
+        /* ===== COVER 頁面 ===== */
+        #cover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            align-items: center;
+            justify-content: space-between;
+            padding: 60px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #cover::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        #cover::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(30px); }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cover-content {
+            flex: 1;
+            z-index: 2;
+            color: white;
+        }
+
+        .cover-title {
+            font-size: 64px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        .cover-subtitle {
+            font-size: 20px;
+            opacity: 0.95;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            animation: slideInUp 0.8s ease-out 0.1s backwards;
+        }
+
+        .btn-start {
+            display: inline-block;
+            padding: 16px 48px;
+            background: rgba(255, 255, 255, 0.25);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            animation: slideInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        .btn-start:hover {
+            background: rgba(255, 255, 255, 0.35);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .cover-preview {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding-left: 60px;
+            z-index: 2;
+        }
+
+        .preview-item {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: float 5s ease-in-out infinite;
+        }
+
+        .preview-item:nth-child(2) { animation-delay: 0.3s; }
+        .preview-item:nth-child(3) { animation-delay: 0.6s; }
+        .preview-item:nth-child(4) { animation-delay: 0.9s; }
+
+        /* ===== STEP1 頁面 ===== */
+        #step1 {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 60px 40px;
+        }
+
+        .step-title {
+            font-size: 40px;
+            color: #333;
+            margin-bottom: 60px;
+            font-weight: 600;
+            animation: slideInDown 0.6s ease-out;
+        }
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            max-width: 700px;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        .emoji-card {
+            aspect-ratio: 1;
+            background: white;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+
+        .emoji-card:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .emoji-card:active {
+            transform: scale(0.95);
+        }
+
+        /* ===== STEP2 頁面 ===== */
+        #step2 {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 60px 40px;
+        }
+
+        .input-container {
+            background: white;
+            border-radius: 32px;
+            padding: 40px;
+            box-shadow: var(--shadow-xl);
+            max-width: 500px;
+            width: 100%;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        .selected-emoji {
+            text-align: center;
+            font-size: 60px;
+            margin-bottom: 30px;
+        }
+
+        .step2-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .textarea-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: none;
+            transition: all 0.3s ease;
+            background: #f8f9fb;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .char-count {
+            text-align: right;
+            color: #999;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .char-count.warning {
+            color: #f5576c;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ===== STEP3 頁面 ===== */
+        #step3 {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            padding: 40px;
+        }
+
+        .gallery-container {
+            width: 90%;
+            max-width: 1000px;
+            height: 70vh;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 32px;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .canvas-area {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .message-card {
+            position: absolute;
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            user-select: none;
+            width: 220px;
+            height: 150px;
+            overflow: hidden;
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.4;
+            will-change: transform;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .message-card:hover {
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .message-emoji {
+            font-size: 20px;
+            margin-bottom: 8px;
+            display: block;
+            line-height: 1;
+        }
+
+        .message-text {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .next-btn {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            padding: 12px 24px;
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .next-btn:hover {
+            background: rgba(102, 126, 234, 1);
+            transform: translateY(-2px);
+        }
+
+        /* ===== 響應式設計 ===== */
+        @media (max-width: 768px) {
+            #cover {
+                flex-direction: column;
+                padding: 40px 20px;
+            }
+
+            .cover-content {
+                margin-bottom: 40px;
+            }
+
+            .cover-title {
+                font-size: 36px;
+            }
+
+            .cover-subtitle {
+                font-size: 16px;
+            }
+
+            .cover-preview {
+                grid-template-columns: 1fr 1fr;
+                padding-left: 0;
+                gap: 20px;
+            }
+
+            .preview-item {
+                font-size: 60px;
+            }
+
+            .emoji-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .gallery-container {
+                height: 50vh;
+            }
+
+            .step-title {
+                font-size: 28px;
+            }
+
+            .input-container {
+                padding: 30px 20px;
+            }
+            
+            .message-card {
+                width: 180px;
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="cover" class="page active">
+        <div class="cover-content">
+            <div class="cover-title">留言牆</div>
+            <div class="cover-subtitle">
+                分享你的想法，看見他人的故事<br>
+                讓每條留言都成為一件藝術作品
+            </div>
+            <button class="btn-start" onclick="app.goToStep(1)">開始體驗</button>
+        </div>
+        <div class="cover-preview">
+            <div class="preview-item">🎁</div>
+            <div class="preview-item">🍕</div>
+            <div class="preview-item">🧋</div>
+            <div class="preview-item">📝</div>
+        </div>
+    </div>
+
+    <div id="step1" class="page">
+        <div class="step-title">請直接點擊喜歡的圖案</div>
+        <div class="emoji-grid">
+            <div class="emoji-card" data-emoji="🎁" onclick="app.selectEmoji('🎁')">🎁</div>
+            <div class="emoji-card" data-emoji="🍕" onclick="app.selectEmoji('🍕')">🍕</div>
+            <div class="emoji-card" data-emoji="🧋" onclick="app.selectEmoji('🧋')">🧋</div>
+            <div class="emoji-card" data-emoji="📝" onclick="app.selectEmoji('📝')">📝</div>
+        </div>
+    </div>
+
+    <div id="step2" class="page">
+        <div class="input-container">
+            <div class="selected-emoji" id="selectedEmojiDisplay"></div>
+            <div class="step2-title">你想說些什麼呢？</div>
+            <div class="textarea-wrapper">
+                <textarea 
+                    id="messageInput" 
+                    placeholder="輸入你的留言..."
+                    maxlength="50"
+                    oninput="app.updateCharCount()"></textarea>
+                <div class="char-count">
+                    <span id="charCount">0</span>/50
+                </div>
+            </div>
+            <button class="btn-submit" onclick="app.submitMessage()">送出留言</button>
+        </div>
+    </div>
+
+    <div id="step3" class="page">
+        <div class="gallery-container">
+            <div class="canvas-area" id="canvasArea"></div>
+            <button class="next-btn" onclick="app.goToStep(1)">再寫一張</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== 物理引擎 =====
+        class PhysicsCard {
+            constructor(emoji, message, x, y, containerWidth, containerHeight) {
+                this.emoji = emoji;
+                this.message = message;
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 8; 
+                this.vy = Math.random() - 0.5;
+                this.rotation = Math.random() * 20 - 10;
+                this.rotationVelocity = (Math.random() - 0.5) * 0.15;
+                
+                const isMobile = window.innerWidth <= 768;
+                this.width = isMobile ? 180 : 220;
+                this.height = isMobile ? 120 : 150;
+                
+                this.gravity = 0.4;
+                this.friction = 0.99; 
+                this.bounceElasticity = 0.75; 
+                
+                this.isResting = false;
+                this.restFrames = 0;
+                this.containerWidth = containerWidth;
+                this.containerHeight = containerHeight;
+                this.element = null;
+            }
+
+            update(cards, containerHeight) {
+                if (this.isResting) {
+                    this.restFrames++;
+                    if (this.restFrames < 30) {
+                        this.vx *= 0.92;
+                        this.vy *= 0.92;
+                        this.rotationVelocity *= 0.95;
+                    } else {
+                        this.vx = 0;
+                        this.vy = 0;
+                        this.rotationVelocity = 0;
+                    }
+                    this.rotation += this.rotationVelocity;
+                    return;
+                }
+
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+
+                this.rotation += this.rotationVelocity;
+                this.rotationVelocity *= 0.98;
+
+                // 邊界碰撞（左右）
+                if (this.x < 0) {
+                    this.x = 0;
+                    this.vx = Math.abs(this.vx) * this.bounceElasticity;
+                    this.rotationVelocity *= -0.5;
+                }
+                if (this.x + this.width > this.containerWidth) {
+                    this.x = this.containerWidth - this.width;
+                    this.vx = -Math.abs(this.vx) * this.bounceElasticity;
+                    this.rotationVelocity *= -0.5;
+                }
+
+                // 卡片互相碰撞
+                for (let card of cards) {
+                    if (card === this) continue;
+                    if (this.checkCollisionAABB(card)) {
+                        if (card.isResting && (Math.abs(this.vx) > 0.5 || Math.abs(this.vy) > 0.5)) {
+                            card.isResting = false;
+                            card.restFrames = 0;
+                        }
+                        this.resolveCollision(card);
+                    }
+                }
+
+                // 地面碰撞
+                if (this.y + this.height >= containerHeight) {
+                    this.y = containerHeight - this.height;
+                    this.vy *= -this.bounceElasticity;
+                    
+                    if (Math.abs(this.vy) < 1.5 && Math.abs(this.vx) < 0.8) {
+                        this.isResting = true;
+                        this.vy = 0;
+                        this.restFrames = 0;
+                    }
+                }
+
+                if (Math.abs(this.vx) < 0.2 && Math.abs(this.vy) < 0.2 && Math.abs(this.rotationVelocity) < 0.05 && (this.y + this.height >= containerHeight - 5)) {
+                    this.isResting = true;
+                    this.vx = 0;
+                    this.vy = 0;
+                    this.rotationVelocity = 0;
+                    this.restFrames = 0;
+                }
+            }
+
+            checkCollisionAABB(other) {
+                return !(this.x + this.width < other.x ||
+                         this.x > other.x + other.width ||
+                         this.y + this.height < other.y ||
+                         this.y > other.y + other.height);
+            }
+
+            resolveCollision(other) {
+                const overlapLeft = (this.x + this.width) - other.x;
+                const overlapRight = (other.x + other.width) - this.x;
+                const overlapTop = (this.y + this.height) - other.y;
+                const overlapBottom = (other.y + other.height) - this.y;
+
+                const minOverlapX = Math.min(overlapLeft, overlapRight);
+                const minOverlapY = Math.min(overlapTop, overlapBottom);
+
+                if (minOverlapX < minOverlapY) {
+                    if (overlapLeft < overlapRight) {
+                        this.x = other.x - this.width;
+                        this.vx = -Math.abs(this.vx) * this.bounceElasticity;
+                        other.vx = Math.abs(other.vx) * this.bounceElasticity;
+                    } else {
+                        this.x = other.x + other.width;
+                        this.vx = Math.abs(this.vx) * this.bounceElasticity;
+                        other.vx = -Math.abs(other.vx) * this.bounceElasticity;
+                    }
+                } else {
+                    if (overlapTop < overlapBottom) {
+                        this.y = other.y - this.height;
+                        this.vy = -Math.abs(this.vy) * this.bounceElasticity;
+                        other.vy = Math.abs(other.vy) * this.bounceElasticity;
+                    } else {
+                        this.y = other.y + other.height;
+                        this.vy = Math.abs(this.vy) * this.bounceElasticity;
+                        other.vy = -Math.abs(other.vy) * this.bounceElasticity;
+                    }
+                }
+                this.rotationVelocity *= 0.8;
+            }
+        }
+
+        // ===== 應用程式邏輯 =====
+        const app = {
+            currentEmoji: null,
+            cards: [],
+            animationId: null,
+            containerHeight: 0,
+
+            init() {
+                this.startPhysicsLoop();
+            },
+
+            goToStep(step) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                if (step === 1) {
+                    document.getElementById('step1').classList.add('active');
+                } else if (step === 2) {
+                    document.getElementById('step2').classList.add('active');
+                } else if (step === 3) {
+                    document.getElementById('step3').classList.add('active');
+                    setTimeout(() => {
+                        this.startGallery();
+                    }, 50);
+                } else {
+                    document.getElementById('cover').classList.add('active');
+                }
+            },
+
+            selectEmoji(emoji) {
+                this.currentEmoji = emoji;
+                document.getElementById('selectedEmojiDisplay').textContent = emoji;
+                this.goToStep(2);
+                document.getElementById('messageInput').focus();
+            },
+
+            updateCharCount() {
+                const input = document.getElementById('messageInput');
+                const count = document.getElementById('charCount');
+                const charCountDiv = document.querySelector('.char-count');
+                count.textContent = input.value.length;
+                charCountDiv.classList.toggle('warning', input.value.length > 40);
+            },
+
+            submitMessage() {
+                const text = document.getElementById('messageInput').value.trim();
+                if (!text || !this.currentEmoji) return;
+
+                const data = {
+                    emoji: this.currentEmoji,
+                    message: text,
+                    timestamp: Date.now()
+                };
+
+                let messages = JSON.parse(localStorage.getItem('messages') || '[]');
+                messages.push(data);
+                
+                // 限制最多儲存 20 筆留言（超過自動消除最早的）
+                if (messages.length > 20) {
+                    messages = messages.slice(-20);
+                }
+                localStorage.setItem('messages', JSON.stringify(messages));
+
+                document.getElementById('messageInput').value = '';
+                this.updateCharCount();
+                
+                this.goToStep(3);
+            },
+
+            startGallery() {
+                const canvasArea = document.getElementById('canvasArea');
+                canvasArea.innerHTML = '';
+                this.cards = [];
+                this.containerHeight = canvasArea.offsetHeight;
+                const containerWidth = canvasArea.offsetWidth;
+
+                let messages = JSON.parse(localStorage.getItem('messages') || '[]');
+                
+                // 確保讀取時不超過 20 筆
+                if (messages.length > 20) {
+                    messages = messages.slice(-20);
+                }
+                
+                messages.forEach((data, index) => {
+                    const delay = index * 0.2;
+                    setTimeout(() => {
+                        const card = new PhysicsCard(
+                            data.emoji,
+                            data.message,
+                            Math.random() * (containerWidth - 220),
+                            -200 - Math.random() * 200,
+                            containerWidth,
+                            this.containerHeight
+                        );
+                        
+                        const element = document.createElement('div');
+                        element.className = 'message-card';
+                        element.innerHTML = `
+                            <span class="message-emoji">${card.emoji}</span>
+                            <div class="message-text">${card.message}</div>
+                        `;
+                        canvasArea.appendChild(element);
+                        card.element = element;
+                        
+                        this.cards.push(card);
+                    }, delay * 1000);
+                });
+            },
+
+            startPhysicsLoop() {
+                const canvasArea = document.getElementById('canvasArea');
+
+                const animate = () => {
+                    if (document.getElementById('step3').classList.contains('active') && canvasArea) {
+                        const containerHeight = canvasArea.offsetHeight;
+                        
+                        this.cards.forEach(card => {
+                            card.update(this.cards, containerHeight);
+                            if (card.element) {
+                                card.element.style.left = card.x + 'px';
+                                card.element.style.top = card.y + 'px';
+                                card.element.style.transform = `rotate(${card.rotation}deg)`;
+                                card.element.style.opacity = card.isResting ? 1 : 0.95;
+                            }
+                        });
+                    }
+                    this.animationId = requestAnimationFrame(animate);
+                };
+                animate();
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>
