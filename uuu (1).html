@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>山水生靈留言板 - 互動動態牆</title>
+    <title>美崙溪記憶之牆 - 互動留言板</title>
     <style>
         * {
             margin: 0;
@@ -12,6 +12,7 @@
         }
 
         :root {
+            /* 指定的 Pantone 顏色 */
             --p325-cyan: #55C6D9; 
             --p360-green: #00AF3F; 
             --bg-mist: #F0F8F7; 
@@ -34,6 +35,7 @@
             color: var(--text-dark);
         }
 
+        /* ===== 頁面容器 ===== */
         .page {
             position: fixed;
             top: 0;
@@ -53,6 +55,7 @@
             transform: scale(1);
         }
 
+        /* ===== COVER 頁面 (首頁) ===== */
         #cover {
             background: var(--primary-gradient);
             align-items: center;
@@ -62,6 +65,7 @@
             overflow: hidden;
         }
 
+        /* 水文流動背景裝飾 */
         #cover::before {
             content: '';
             position: absolute;
@@ -172,6 +176,7 @@
         .preview-item:nth-child(3) { animation-delay: 2s; border-radius: 20% 50% 20% 50%; }
         .preview-item:nth-child(4) { animation-delay: 3s; }
 
+        /* ===== STEP1 選擇圖案 ===== */
         #step1 {
             flex-direction: column;
             align-items: center;
@@ -222,6 +227,7 @@
             transform: scale(0.95);
         }
 
+        /* ===== STEP2 輸入留言 ===== */
         #step2 {
             flex-direction: column;
             align-items: center;
@@ -330,6 +336,7 @@
             background: #9E9E9E;
         }
 
+        /* ===== STEP3 動態牆 ===== */
         #step3 {
             flex-direction: column;
             align-items: center;
@@ -448,6 +455,7 @@
             box-shadow: 0 10px 25px rgba(85,198,217,0.4);
         }
 
+        /* ===== 響應式設計 (手機版) ===== */
         @media (max-width: 768px) {
             #cover { flex-direction: column; padding: 40px 20px; text-align: center; }
             .cover-content { margin-bottom: 40px; display: flex; flex-direction: column; align-items: center; }
@@ -456,16 +464,23 @@
             .btn-start { padding: 15px 35px; font-size: 16px; }
             .cover-preview { grid-template-columns: 1fr 1fr; padding-left: 0; gap: 20px; width: 100%; max-width: 400px; }
             .preview-item { font-size: 60px; }
+            
             .step-title { font-size: 28px; margin-bottom: 40px; }
             .emoji-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
             .emoji-card { font-size: 70px; border-radius: 20px; }
+            
             .input-container { padding: 30px 20px; }
             .step2-title { font-size: 20px; }
             textarea { height: 110px; font-size: 16px; }
+            
             .gallery-container { height: 75vh; border-radius: 30px; }
-            .message-card { width: 190px; height: 130px; padding: 15px; border-radius: 40px 30px 50px 35px / 35px 50px 30px 45px; }
-            .message-emoji { font-size: 22px; margin-bottom: 8px; }
-            .message-text { font-size: 13px; -webkit-line-clamp: 2; }
+            
+            /* 手機版石頭縮小尺寸 */
+            .message-card { width: 130px; height: 90px; padding: 10px; border-radius: 30px 20px 40px 25px / 25px 40px 20px 35px; }
+            .message-emoji { font-size: 18px; margin-bottom: 4px; }
+            .message-text { font-size: 12px; -webkit-line-clamp: 2; }
+            .card-number { top: 8px; left: 12px; font-size: 10px; }
+            
             .next-btn { bottom: 25px; right: 25px; padding: 12px 20px; font-size: 14px; }
         }
     </style>
@@ -473,52 +488,52 @@
 <body>
     <div id="cover" class="page active">
         <div class="cover-content">
-            <div class="cover-title">生靈留言板</div>
+            <div class="cover-title">美崙溪記憶之牆</div>
             <div class="cover-subtitle">
-                採擷天地靈氣，分享萬物心聲<br>
-                讓每一抹思緒，皆化為山水間的奇妙遇見
+                寫下你與這片水域的故事<br>
+                讓每一抹思緒，化作水文間的洄盪
             </div>
-            <button id="btn-start" class="btn-start">開啟靈性之旅</button>
+            <button id="btn-start" class="btn-start">潛入溪流</button>
         </div>
         <div class="cover-preview">
+            <div class="preview-item">🐟</div>
+            <div class="preview-item">🌿</div>
             <div class="preview-item">⛰️</div>
-            <div class="preview-item">🌊</div>
-            <div class="preview-item">🌲</div>
-            <div class="preview-item">🐦</div>
+            <div class="preview-item">💧</div>
         </div>
     </div>
 
     <div id="step1" class="page">
-        <div class="step-title">請喚醒萬物靈光</div>
+        <div class="step-title">請選擇一個代表你的溪流生靈</div>
         <div class="emoji-grid">
+            <div class="emoji-card" data-emoji="🐟">🐟</div>
+            <div class="emoji-card" data-emoji="🌿">🌿</div>
             <div class="emoji-card" data-emoji="⛰️">⛰️</div>
-            <div class="emoji-card" data-emoji="🌊">🌊</div>
-            <div class="emoji-card" data-emoji="🌲">🌲</div>
-            <div class="emoji-card" data-emoji="🐦">🐦</div>
+            <div class="emoji-card" data-emoji="💧">💧</div>
         </div>
     </div>
 
     <div id="step2" class="page">
         <div class="input-container">
             <div class="selected-emoji" id="selectedEmojiDisplay"></div>
-            <div class="step2-title">你想對萬物說些什麼？</div>
+            <div class="step2-title">你想對美崙溪說些什麼？</div>
             <div class="textarea-wrapper">
                 <textarea 
                     id="messageInput" 
-                    placeholder="在此寫下靈感..."
+                    placeholder="分享你曾在這裡看過的風景或回憶..."
                     maxlength="50"></textarea>
                 <div class="char-count">
                     <span id="charCount">0</span>/50
                 </div>
             </div>
-            <button id="btn-submit" class="btn-submit">送出心聲</button>
+            <button id="btn-submit" class="btn-submit">投入水中</button>
         </div>
     </div>
 
     <div id="step3" class="page">
         <div class="gallery-container">
             <div class="canvas-area" id="canvasArea"></div>
-            <button id="btn-restart" class="next-btn">再結善緣</button>
+            <button id="btn-restart" class="next-btn">重返岸邊</button>
         </div>
     </div>
 
@@ -526,6 +541,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+        // 你的專屬 Firebase 金鑰
         const firebaseConfig = {
             apiKey: "AIzaSyAk7_r7HGijcFBzTjameuieXoSCrBwrg0g",
             authDomain: "uuu566-ec42d.firebaseapp.com",
@@ -539,6 +555,7 @@
         const firebaseApp = initializeApp(firebaseConfig);
         const db = getFirestore(firebaseApp);
 
+        // ===== 物理引擎 =====
         class PhysicsCard {
             constructor(emoji, message, x, y, containerWidth, containerHeight) {
                 this.emoji = emoji;
@@ -550,9 +567,10 @@
                 this.rotation = Math.random() * 20 - 10; 
                 this.rotationVelocity = (Math.random() - 0.5) * 0.12;
                 
+                // 動態取得是否為手機，並設定與 CSS 一致的碰撞箱尺寸
                 const isMobile = window.innerWidth <= 768;
-                this.width = isMobile ? 190 : 240; 
-                this.height = isMobile ? 130 : 170; 
+                this.width = isMobile ? 130 : 240; 
+                this.height = isMobile ? 90 : 170; 
                 
                 this.gravity = 0.35; 
                 this.friction = 0.99; 
@@ -585,6 +603,7 @@
                 this.rotation += this.rotationVelocity;
                 this.rotationVelocity *= 0.98; 
 
+                // 邊界碰撞
                 if (this.x < 0) {
                     this.x = 0;
                     this.vx = Math.abs(this.vx) * this.bounceElasticity;
@@ -596,6 +615,7 @@
                     this.rotationVelocity *= -0.5;
                 }
 
+                // 互撞
                 for (let card of cards) {
                     if (card === this) continue;
                     if (this.checkCollisionAABB(card)) {
@@ -607,6 +627,7 @@
                     }
                 }
 
+                // 觸底
                 if (this.y + this.height >= containerHeight) {
                     this.y = containerHeight - this.height;
                     this.vy *= -this.bounceElasticity;
@@ -618,6 +639,7 @@
                     }
                 }
 
+                // 完全靜止
                 if (Math.abs(this.vx) < 0.2 && Math.abs(this.vy) < 0.2 && Math.abs(this.rotationVelocity) < 0.05 && (this.y + this.height >= containerHeight - 5)) {
                     this.isResting = true;
                     this.vx = 0;
@@ -668,6 +690,7 @@
             }
         }
 
+        // ===== 應用程式邏輯 =====
         const app = {
             currentEmoji: null,
             cards: [],
@@ -745,21 +768,21 @@
 
                     document.getElementById('messageInput').value = '';
                     this.updateCharCount();
-                    submitBtn.textContent = '送出心聲';
+                    submitBtn.textContent = '投入水中';
                     this.isSubmitting = false;
                     this.goToStep(3);
 
                 } catch (error) {
                     console.error('寫入 Firebase 失敗:', error);
-                    submitBtn.textContent = '送出心聲';
+                    submitBtn.textContent = '投入水中';
                     this.isSubmitting = false;
-                    alert('與萬物連線失敗，請檢查網路。');
+                    alert('與流域連線失敗，請檢查網路。');
                 }
             },
 
             async fetchAndStartGallery() {
                 const canvasArea = document.getElementById('canvasArea');
-                canvasArea.innerHTML = '<div style="color:var(--text-dark); text-align:center; padding-top: 50px; font-weight: bold; font-size: 24px;">天地靈氣匯聚中...</div>';
+                canvasArea.innerHTML = '<div style="color:var(--text-dark); text-align:center; padding-top: 50px; font-weight: bold; font-size: 24px;">水文記憶撈取中...</div>';
                 this.cards = [];
                 
                 try {
@@ -780,10 +803,13 @@
                     messages.forEach((data, index) => {
                         const delay = index * 0.2 + Math.random() * 0.1; 
                         setTimeout(() => {
+                            const isMobile = window.innerWidth <= 768;
+                            const cardWidth = isMobile ? 130 : 240;
+                            
                             const card = new PhysicsCard(
                                 data.emoji,
                                 data.message,
-                                Math.random() * (containerWidth - 240),
+                                Math.random() * (containerWidth - cardWidth),
                                 -250 - Math.random() * 300, 
                                 containerWidth,
                                 this.containerHeight
@@ -795,6 +821,7 @@
                             element.style.borderTopRightRadius = `${40 + Math.random()*20}px ${60 + Math.random()*20}px`;
                             element.style.borderBottomLeftRadius = `${60 + Math.random()*20}px ${40 + Math.random()*20}px`;
                             
+                            // 這裡加入了數字編號
                             element.innerHTML = `
                                 <div class="card-number">#${index + 1}</div>
                                 <span class="message-emoji">${card.emoji}</span>
@@ -808,7 +835,7 @@
                     });
                 } catch (error) {
                     console.error('從 Firebase 讀取失敗:', error);
-                    canvasArea.innerHTML = '<div style="color:var(--text-dark); text-align:center; padding-top: 50px; font-size: 20px;">載入失敗，天地失序。</div>';
+                    canvasArea.innerHTML = '<div style="color:var(--text-dark); text-align:center; padding-top: 50px; font-size: 20px;">讀取失敗，請重新連線。</div>';
                 }
             },
 
@@ -835,6 +862,7 @@
             }
         };
 
+        // 啟動應用
         app.init();
     </script>
 </body>
