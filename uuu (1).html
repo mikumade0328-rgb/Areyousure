@@ -85,25 +85,13 @@
         }
 
         @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes slideInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .cover-content {
@@ -289,9 +277,7 @@
             margin-top: 8px;
         }
 
-        .char-count.warning {
-            color: #f5576c;
-        }
+        .char-count.warning { color: #f5576c; }
 
         .btn-submit {
             width: 100%;
@@ -401,53 +387,17 @@
 
         /* ===== 響應式設計 ===== */
         @media (max-width: 768px) {
-            #cover {
-                flex-direction: column;
-                padding: 40px 20px;
-            }
-
-            .cover-content {
-                margin-bottom: 40px;
-            }
-
-            .cover-title {
-                font-size: 36px;
-            }
-
-            .cover-subtitle {
-                font-size: 16px;
-            }
-
-            .cover-preview {
-                grid-template-columns: 1fr 1fr;
-                padding-left: 0;
-                gap: 20px;
-            }
-
-            .preview-item {
-                font-size: 60px;
-            }
-
-            .emoji-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .gallery-container {
-                height: 50vh;
-            }
-
-            .step-title {
-                font-size: 28px;
-            }
-
-            .input-container {
-                padding: 30px 20px;
-            }
-            
-            .message-card {
-                width: 180px;
-                height: 120px;
-            }
+            #cover { flex-direction: column; padding: 40px 20px; }
+            .cover-content { margin-bottom: 40px; }
+            .cover-title { font-size: 36px; }
+            .cover-subtitle { font-size: 16px; }
+            .cover-preview { grid-template-columns: 1fr 1fr; padding-left: 0; gap: 20px; }
+            .preview-item { font-size: 60px; }
+            .emoji-grid { grid-template-columns: repeat(2, 1fr); }
+            .gallery-container { height: 50vh; }
+            .step-title { font-size: 28px; }
+            .input-container { padding: 30px 20px; }
+            .message-card { width: 180px; height: 120px; }
         }
     </style>
 </head>
@@ -504,7 +454,24 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // 整合你提供的正確金鑰
+        const firebaseConfig = {
+            apiKey: "AIzaSyAk7_r7HGijcFBzTjameuieXoSCrBwrg0g",
+            authDomain: "uuu566-ec42d.firebaseapp.com",
+            projectId: "uuu566-ec42d",
+            storageBucket: "uuu566-ec42d.firebasestorage.app",
+            messagingSenderId: "148385432205",
+            appId: "1:148385432205:web:5055eaaab6206e8c6b98c4",
+            measurementId: "G-215P1M3NYL"
+        };
+
+        const firebaseApp = initializeApp(firebaseConfig);
+        const db = getFirestore(firebaseApp);
+
         // ===== 物理引擎 =====
         class PhysicsCard {
             constructor(emoji, message, x, y, containerWidth, containerHeight) {
@@ -557,7 +524,6 @@
                 this.rotation += this.rotationVelocity;
                 this.rotationVelocity *= 0.98;
 
-                // 邊界碰撞（左右）
                 if (this.x < 0) {
                     this.x = 0;
                     this.vx = Math.abs(this.vx) * this.bounceElasticity;
@@ -569,7 +535,6 @@
                     this.rotationVelocity *= -0.5;
                 }
 
-                // 卡片互相碰撞
                 for (let card of cards) {
                     if (card === this) continue;
                     if (this.checkCollisionAABB(card)) {
@@ -581,7 +546,6 @@
                     }
                 }
 
-                // 地面碰撞
                 if (this.y + this.height >= containerHeight) {
                     this.y = containerHeight - this.height;
                     this.vy *= -this.bounceElasticity;
@@ -642,13 +606,13 @@
                 this.rotationVelocity *= 0.8;
             }
         }
-
-        // ===== 應用程式邏輯 =====
+        ===== 應用程式邏輯 =====
         const app = {
             currentEmoji: null,
             cards: [],
             animationId: null,
             containerHeight: 0,
+            isSubmitting: false,
 
             init() {
                 this.startPhysicsLoop();
@@ -662,9 +626,7 @@
                     document.getElementById('step2').classList.add('active');
                 } else if (step === 3) {
                     document.getElementById('step3').classList.add('active');
-                    setTimeout(() => {
-                        this.startGallery();
-                    }, 50);
+                    this.fetchAndStartGallery(); 
                 } else {
                     document.getElementById('cover').classList.add('active');
                 }
@@ -685,69 +647,85 @@
                 charCountDiv.classList.toggle('warning', input.value.length > 40);
             },
 
-            submitMessage() {
+            async submitMessage() {
+                if (this.isSubmitting) return;
+                
                 const text = document.getElementById('messageInput').value.trim();
                 if (!text || !this.currentEmoji) return;
 
-                const data = {
-                    emoji: this.currentEmoji,
-                    message: text,
-                    timestamp: Date.now()
-                };
+                const submitBtn = document.querySelector('.btn-submit');
+                submitBtn.textContent = '傳送中...';
+                this.isSubmitting = true;
 
-                let messages = JSON.parse(localStorage.getItem('messages') || '[]');
-                messages.push(data);
-                
-                // 限制最多儲存 20 筆留言（超過自動消除最早的）
-                if (messages.length > 20) {
-                    messages = messages.slice(-20);
+                try {
+                    await addDoc(collection(db, "messages"), {
+                        emoji: this.currentEmoji,
+                        message: text,
+                        timestamp: Date.now()
+                    });
+
+                    document.getElementById('messageInput').value = '';
+                    this.updateCharCount();
+                    submitBtn.textContent = '送出留言';
+                    this.isSubmitting = false;
+                    this.goToStep(3);
+
+                } catch (error) {
+                    console.error('寫入 Firebase 失敗:', error);
+                    submitBtn.textContent = '送出留言';
+                    this.isSubmitting = false;
+                    alert('傳送失敗，請檢查網路連線或資料庫權限設定。');
                 }
-                localStorage.setItem('messages', JSON.stringify(messages));
-
-                document.getElementById('messageInput').value = '';
-                this.updateCharCount();
-                
-                this.goToStep(3);
             },
 
-            startGallery() {
+            async fetchAndStartGallery() {
                 const canvasArea = document.getElementById('canvasArea');
-                canvasArea.innerHTML = '';
+                canvasArea.innerHTML = '<div style="color:white; text-align:center; padding-top: 50px; font-weight: bold; font-size: 20px;">載入留言中...</div>';
                 this.cards = [];
-                this.containerHeight = canvasArea.offsetHeight;
-                const containerWidth = canvasArea.offsetWidth;
+                
+                try {
+                    const q = query(collection(db, "messages"), orderBy("timestamp", "desc"), limit(20));
+                    const querySnapshot = await getDocs(q);
+                    
+                    const messages = [];
+                    querySnapshot.forEach((doc) => {
+                        messages.push(doc.data());
+                    });
+                    
+                    messages.reverse();
 
-                let messages = JSON.parse(localStorage.getItem('messages') || '[]');
-                
-                // 確保讀取時不超過 20 筆
-                if (messages.length > 20) {
-                    messages = messages.slice(-20);
+                    canvasArea.innerHTML = '';
+                    this.containerHeight = canvasArea.offsetHeight;
+                    const containerWidth = canvasArea.offsetWidth;
+
+                    messages.forEach((data, index) => {
+                        const delay = index * 0.2;
+                        setTimeout(() => {
+                            const card = new PhysicsCard(
+                                data.emoji,
+                                data.message,
+                                Math.random() * (containerWidth - 220),
+                                -200 - Math.random() * 200,
+                                containerWidth,
+                                this.containerHeight
+                            );
+                            
+                            const element = document.createElement('div');
+                            element.className = 'message-card';
+                            element.innerHTML = `
+                                <span class="message-emoji">${card.emoji}</span>
+                                <div class="message-text">${card.message}</div>
+                            `;
+                            canvasArea.appendChild(element);
+                            card.element = element;
+                            
+                            this.cards.push(card);
+                        }, delay * 1000);
+                    });
+                } catch (error) {
+                    console.error('從 Firebase 讀取失敗:', error);
+                    canvasArea.innerHTML = '<div style="color:white; text-align:center; padding-top: 50px; font-size: 20px;">載入失敗，請確認 Firebase 測試模式已啟用。</div>';
                 }
-                
-                messages.forEach((data, index) => {
-                    const delay = index * 0.2;
-                    setTimeout(() => {
-                        const card = new PhysicsCard(
-                            data.emoji,
-                            data.message,
-                            Math.random() * (containerWidth - 220),
-                            -200 - Math.random() * 200,
-                            containerWidth,
-                            this.containerHeight
-                        );
-                        
-                        const element = document.createElement('div');
-                        element.className = 'message-card';
-                        element.innerHTML = `
-                            <span class="message-emoji">${card.emoji}</span>
-                            <div class="message-text">${card.message}</div>
-                        `;
-                        canvasArea.appendChild(element);
-                        card.element = element;
-                        
-                        this.cards.push(card);
-                    }, delay * 1000);
-                });
             },
 
             startPhysicsLoop() {
@@ -772,6 +750,8 @@
                 animate();
             }
         };
+
+        window.app = app;
 
         document.addEventListener('DOMContentLoaded', () => {
             app.init();
