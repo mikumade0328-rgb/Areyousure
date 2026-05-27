@@ -198,7 +198,7 @@ textarea {
     background: var(--white);
     border: 2px solid rgba(85,198,217,.22);
     border-radius: 8px;
-    box-shadow: var(--shadow);
+        box-shadow: var(--shadow);
 }
 
 #selectedEmojiDisplay {
@@ -298,7 +298,7 @@ textarea:focus {
     width: 100%;
     height: 100%;
     overflow: hidden;
-}
+    }
 
 .canvas-area::before {
     content: "";
@@ -398,7 +398,7 @@ textarea:focus {
 
 .blessing-container {
     width: min(700px, 90vw);
-    padding: clamp(34px, 5vw, 60px);
+      padding: clamp(34px, 5vw, 60px);
     border: 2px solid rgba(85,198,217,.24);
     border-radius: 8px;
     background: var(--white);
@@ -498,7 +498,7 @@ textarea:focus {
 </style>
 </head>
 <body>
-<div id="cover" class="page active">
+    <div id="cover" class="page active">
     <div class="cover-content">
         <div class="cover-title">河川記憶</div>
         <div class="cover-subtitle">花蓮美崙溪流域文化重織與韌性水路</div>
@@ -534,18 +534,18 @@ textarea:focus {
 <div id="step2" class="page">
     <div class="input-container">
         <div id="selectedEmojiDisplay"></div>
-        <div class="step-title" style="font-size:24px;margin-bottom:20px;">留下你與水的記憶或感想八</div>
-        <textarea id="messageInput" maxlength="50" placeholder="輸入 20 字以內的留言"></textarea>
+        <div class="step-title" style="font-size:24px;margin-bottom:20px;">留下你的河川記憶</div>
+        <textarea id="messageInput" maxlength="50" placeholder="輸入 50 字以內的留言"></textarea>
         <div class="char-count"><span id="charCount">0</span>/50</div>
-        <button id="btn-submit" class="btn-submit">潛入水中</button>
+        <button id="btn-submit" class="btn-submit">送出留言</button>
     </div>
 </div>
 
 <div id="step3" class="page">
     <div class="wall-shell">
         <aside class="wall-aside">
-            <div class="wall-kicker">ForMoSa</div>
-            <div class="wall-title">記憶水路</div>
+            <div class="wall-kicker">ForMoSac</div>
+            <div class="wall-title">美崙溪記憶水路</div>
         </aside>
         <div class="gallery-container">
             <div class="canvas-area" id="canvasArea"></div>
@@ -591,14 +591,14 @@ async function initFirebase() {
     }
 }
 
-const blessings = [
+   const blessings = [
     "願你的生活如美崙溪般生生不息。",
     "願溪水洗滌憂愁，帶回內心的寧靜。",
     "願你在生活的每個角落，都能遇見屬於自己的湧泉。",
     "根深葉茂，願你如河岸森林般韌性生長。",
     "塊陶。",
     "謝謝今天過來留言，祝福您今天都是綠燈通行順順利利。",
-    "好山好水好無聊。",
+       "好山好水好無聊。",
     "你再繼續焦慮你會燒焦。",
     "做設計當作出去玩散散心。",
     "今天你睡了嗎。",
@@ -620,15 +620,22 @@ const fallbackMessages = [
     { emoji: "🌿", message: "願生活慢慢發芽。" }
 ];
 
-const maxMessages = 15;
 const desktopMaxMessages = 15;
 const mobileMaxMessages = 12;
 
 function getMaxMessages() {
     return window.innerWidth <= 900 ? mobileMaxMessages : desktopMaxMessages;
 }
-    function escapeHTML(value) {
+
+function escapeHTML(value) {
     return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#039;"
+    }[char]));
+}
 
 class PhysicsCard {
     constructor(emoji, message, x, y, cw, ch) {
@@ -792,7 +799,7 @@ const app = {
         document.getElementById("charCount").textContent = document.getElementById("messageInput").value.length;
     },
 
-    async submit() {
+     async submit() {
         if (this.isSubmitting) return;
 
         const input = document.getElementById("messageInput");
@@ -818,14 +825,14 @@ const app = {
                 message: text
             });
 
-             while (fallbackMessages.length > getMaxMessages()) {
+            while (fallbackMessages.length > getMaxMessages()) {
                 fallbackMessages.shift();
             }
         }
 
         input.value = "";
         this.updateCount();
-        btn.textContent = "潛入水中";
+        btn.textContent = "送出留言";
         this.isSubmitting = false;
         this.go(3);
     },
@@ -849,7 +856,6 @@ const app = {
             const q = firebaseAPI.query(
                 firebaseAPI.collection(db, "messages"),
                 firebaseAPI.orderBy("timestamp", "desc"),
-                firebaseAPI.limit(maxMessages)
                 firebaseAPI.limit(getMaxMessages())
             );
             const snap = await firebaseAPI.getDocs(q);
@@ -860,7 +866,7 @@ const app = {
         }
 
         if (!data.length) data = fallbackMessages;
-        data = data.slice(-maxMessages);
+        data = data.slice(-getMaxMessages());
         if (token !== this.wallToken) return;
 
         canvas.innerHTML = "";
@@ -868,7 +874,6 @@ const app = {
     },
 
     dropCards(data) {
-    data = data.slice(-getMaxMessages());
         const canvas = document.getElementById("canvasArea");
         const cw = canvas.offsetWidth;
         const ch = canvas.offsetHeight;
@@ -893,7 +898,7 @@ const app = {
                 );
 
                 const el = document.createElement("div");
-                el.className = `message-card tone-${i % 3}`;
+                               el.className = `message-card tone-${i % 3}`;
                 el.innerHTML = `
                     <div class="card-number">#${i + 1}</div>
                     <div class="message-emoji">${escapeHTML(card.emoji)}</div>
