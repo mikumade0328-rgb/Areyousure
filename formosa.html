@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ForMoSa 花蓮美崙溪流域文化重織與韌性水路</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --white: #FFFFFF;
+    --mist: #F2FAFA;
+    --ice-blue: #DFF5FA;
+    --water-blue: #55C6D9;
+    --soft-green: #CFEED9;
+    --green: #00AF3F;
+    --deep: #174A55;
+    --text: #243D42;
+    --shadow: 0 20px 45px rgba(23, 74, 85, .16);
+}
+
+body {
+    font-family: "Microsoft JhengHei", sans-serif;
+    overflow: hidden;
+    background: var(--mist);
+    color: var(--text);
+}
+
+button,
+textarea {
+    font: inherit;
+}
+
+.page {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.03);
+    transition: opacity .45s ease, transform .45s ease, visibility .45s;
+    z-index: 1;
+}
+
+.page.active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    z-index: 10;
+}
+
+#cover {
+    justify-content: flex-end;
+    align-items: stretch;
+    padding: clamp(24px, 4vw, 64px);
+    background:
+        linear-gradient(90deg, rgba(15, 66, 75, .76), rgba(15, 66, 75, .22) 55%, rgba(255,255,255,.1)),
+        url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Meilun%20River%20%E7%BE%8E%E5%B4%99%E6%BA%AA%20%EF%BC%88Hualien%2C%20Taiwan%29.jpg") center / cover no-repeat;
+}
+
+.cover-content {
+    position: relative;
+    z-index: 2;
+    width: min(760px, 100%);
+    color: var(--white);
+}
+
+.cover-title {
+    font-size: clamp(46px, 7vw, 86px);
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: 0;
+    margin-bottom: 18px;
+}
+
+.cover-subtitle {
+    font-size: clamp(18px, 2vw, 24px);
+    line-height: 1.8;
+    margin-bottom: 32px;
+}
+
+.intro-panel {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.intro-item {
+    min-height: 92px;
+    padding: 18px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.9);
+    color: var(--deep);
+    box-shadow: 0 12px 28px rgba(0,0,0,.1);
+}
+
+.intro-item strong {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--green);
+    font-size: 16px;
+}
+
+.intro-item span {
+    display: block;
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.photo-credit {
+    position: absolute;
+    right: 18px;
+    bottom: 12px;
+    color: rgba(255,255,255,.78);
+    font-size: 11px;
+}
+
+.btn-start,
+.btn-submit,
+.next-btn,
+.btn-restart {
+    border: 0;
+    cursor: pointer;
+    border-radius: 999px;
+    font-weight: 700;
+    transition: transform .2s ease, filter .2s ease;
+}
+
+.btn-start {
+    padding: 16px 42px;
+    background: var(--white);
+    color: var(--green);
+    font-size: 18px;
+}
+
+.btn-start:hover,
+.btn-submit:hover,
+.next-btn:hover,
+.btn-restart:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.03);
+}
+
+#step1,
+#step2 {
+    padding: 40px 20px;
+    background:
+        linear-gradient(135deg, rgba(85,198,217,.22), transparent 40%),
+        linear-gradient(180deg, var(--white), var(--ice-blue));
+}
+
+.step-title {
+    margin-bottom: 34px;
+    color: var(--deep);
+    font-size: clamp(26px, 4vw, 38px);
+    font-weight: 800;
+    letter-spacing: 0;
+    text-align: center;
+}
+
+.emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    width: min(820px, 92vw);
+}
+
+.emoji-card {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--white);
+    border: 2px solid rgba(85,198,217,.28);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    font-size: clamp(58px, 8vw, 92px);
+    transition: transform .22s ease, border-color .22s ease;
+}
+
+.emoji-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--green);
+}
+
+.input-container {
+    width: min(660px, 92vw);
+    padding: clamp(28px, 4vw, 44px);
+    background: var(--white);
+    border: 2px solid rgba(85,198,217,.22);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+#selectedEmojiDisplay {
+    margin-bottom: 18px;
+    text-align: center;
+    font-size: 68px;
+}
+
+textarea {
+    width: 100%;
+    height: 140px;
+    resize: none;
+    padding: 18px;
+    border: 2px solid rgba(85,198,217,.32);
+    border-radius: 8px;
+    background: #FBFEFE;
+    color: var(--text);
+    font-size: 17px;
+    line-height: 1.6;
+}
+
+textarea:focus {
+    outline: 0;
+    border-color: var(--green);
+}
+
+.char-count {
+    margin-top: 8px;
+    text-align: right;
+    color: rgba(36,61,66,.62);
+}
+
+.btn-submit {
+    width: 100%;
+    margin-top: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--green), var(--water-blue));
+    color: var(--white);
+    font-size: 18px;
+}
+
+#step3 {
+    padding: clamp(18px, 3vw, 38px);
+    background:
+        linear-gradient(90deg, rgba(255,255,255,.76), rgba(255,255,255,.2)),
+        linear-gradient(135deg, var(--ice-blue), var(--soft-green));
+}
+
+.wall-shell {
+    width: min(1500px, 96vw);
+    height: min(860px, 88vh);
+    display: grid;
+    grid-template-columns: minmax(210px, 320px) minmax(0, 1fr);
+    gap: clamp(18px, 3vw, 34px);
+}
+
+.wall-aside {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(20px, 3vw, 42px) 0;
+    color: var(--deep);
+}
+
+.wall-kicker {
+    writing-mode: vertical-rl;
+    color: var(--green);
+    font-size: 14px;
+    letter-spacing: .18em;
+}
+
+.wall-title {
+    writing-mode: vertical-rl;
+    align-self: center;
+    max-height: 66vh;
+    font-size: clamp(34px, 5vw, 68px);
+    line-height: 1.12;
+    font-weight: 800;
+    letter-spacing: .08em;
+}
+
+.gallery-container {
+    position: relative;
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
+    border: 2px solid rgba(85,198,217,.26);
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,255,255,.5)),
+        linear-gradient(135deg, var(--ice-blue), var(--soft-green));
+    box-shadow: var(--shadow);
+}
+
+.canvas-area {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.canvas-area::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(90deg, rgba(85,198,217,.18) 0 18%, transparent 18% 36%, rgba(0,175,63,.1) 36% 52%, transparent 52% 100%);
+    background-size: 280px 100%;
+    animation: waterMove 12s linear infinite;
+    opacity: .55;
+}
+
+@keyframes waterMove {
+    from { background-position: 0 0; }
+    to { background-position: 280px 0; }
+}
+
+.canvas-empty {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 2;
+    transform: translate(-50%, -50%);
+    color: rgba(23,74,85,.72);
+    font-size: clamp(18px, 2vw, 24px);
+}
+
+.message-card {
+    position: absolute;
+    width: 230px;
+    min-height: 152px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 22px 20px 20px;
+    border: 2px solid rgba(23,74,85,.08);
+    border-radius: 8px;
+    background: var(--white);
+    box-shadow: 0 14px 28px rgba(23,74,85,.14);
+    text-align: center;
+    user-select: none;
+    z-index: 2;
+}
+
+.message-card.tone-1 {
+    background: var(--ice-blue);
+}
+
+.message-card.tone-2 {
+    background: var(--soft-green);
+}
+
+.card-number {
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    color: rgba(23,74,85,.48);
+    font-size: 12px;
+}
+
+.message-emoji {
+    margin-bottom: 10px;
+    font-size: 34px;
+    line-height: 1;
+}
+
+.message-text {
+    width: 100%;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    color: var(--deep);
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.next-btn {
+    position: absolute;
+    right: 24px;
+    bottom: 22px;
+    z-index: 5;
+    padding: 14px 26px;
+    background: var(--green);
+    color: var(--white);
+    box-shadow: 0 12px 24px rgba(0, 175, 63, .2);
+}
+
+#step4 {
+    background:
+        linear-gradient(135deg, rgba(85,198,217,.28), rgba(0,175,63,.2)),
+        var(--white);
+}
+
+.blessing-container {
+    width: min(700px, 90vw);
+    padding: clamp(34px, 5vw, 60px);
+    border: 2px solid rgba(85,198,217,.24);
+    border-radius: 8px;
+    background: var(--white);
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.blessing-title {
+    margin-bottom: 28px;
+    color: var(--green);
+    font-size: 24px;
+    font-weight: 800;
+}
+
+#blessing-text {
+    margin-bottom: 36px;
+    color: var(--deep);
+    font-size: clamp(22px, 4vw, 32px);
+    line-height: 1.8;
+}
+
+.btn-restart {
+    padding: 15px 34px;
+    background: var(--water-blue);
+    color: var(--white);
+}
+
+@media (max-width: 900px) {
+    #cover {
+        padding: 28px 20px 40px;
+    }
+
+    .intro-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .intro-item {
+        min-height: auto;
+    }
+
+    .emoji-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .wall-shell {
+        height: 92vh;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .wall-aside {
+        flex-direction: row;
+        align-items: flex-end;
+        padding: 0 2px;
+    }
+
+    .wall-kicker,
+    .wall-title {
+        writing-mode: horizontal-tb;
+    }
+
+    .wall-title {
+        font-size: 28px;
+        letter-spacing: 0;
+    }
+
+    .message-card {
+        width: 132px;
+        min-height: 92px;
+        padding: 12px 10px 10px;
+    }
+
+    .card-number {
+        top: 7px;
+        left: 10px;
+        font-size: 10px;
+    }
+
+    .message-emoji {
+        margin-bottom: 5px;
+        font-size: 20px;
+    }
+
+    .message-text {
+        font-size: 12px;
+        line-height: 1.35;
+        -webkit-line-clamp: 2;
+    }
+
+    .next-btn {
+        right: 14px;
+        bottom: 14px;
+        padding: 12px 20px;
+    }
+}
+</style>
+</head>
+<body>
+<div id="cover" class="page active">
+    <div class="cover-content">
+        <div class="cover-title">河川記憶</div>
+        <div class="cover-subtitle">花蓮美崙溪流域文化重織與韌性水路</div>
+        <div class="intro-panel">
+            <div class="intro-item">
+                <strong>流域記憶</strong>
+                <span>收集觀者與美崙溪的片段感受。</span>
+            </div>
+            <div class="intro-item">
+                <strong>文化重織</strong>
+                <span>讓留言成為共同生成的水路地景。</span>
+            </div>
+            <div class="intro-item">
+                <strong>韌性水路</strong>
+                <span>以互動牆呈現溪流、城市與人的連結。</span>
+            </div>
+        </div>
+        <button id="btn-start" class="btn-start">開始留言</button>
+    </div>
+    <div class="photo-credit">Photo: Evan Centanni / CC BY 4.0</div>
+</div>
+
+<div id="step1" class="page">
+    <div class="step-title">選擇一個溪流符號</div>
+    <div class="emoji-grid">
+        <div class="emoji-card" data-emoji="🐟">🐟</div>
+        <div class="emoji-card" data-emoji="🌿">🌿</div>
+        <div class="emoji-card" data-emoji="⛰️">⛰️</div>
+        <div class="emoji-card" data-emoji="💧">💧</div>
+    </div>
+</div>
+
+<div id="step2" class="page">
+    <div class="input-container">
+        <div id="selectedEmojiDisplay"></div>
+        <div class="step-title" style="font-size:24px;margin-bottom:20px;">留下你與水的記憶或感想八</div>
+        <textarea id="messageInput" maxlength="50" placeholder="輸入 20 字以內的留言"></textarea>
+        <div class="char-count"><span id="charCount">0</span>/50</div>
+        <button id="btn-submit" class="btn-submit">潛入水中</button>
+    </div>
+</div>
+
+<div id="step3" class="page">
+    <div class="wall-shell">
+        <aside class="wall-aside">
+            <div class="wall-kicker">ForMoSac</div>
+            <div class="wall-title">記憶水路</div>
+        </aside>
+        <div class="gallery-container">
+            <div class="canvas-area" id="canvasArea"></div>
+            <button id="btn-to-blessing" class="next-btn">完成</button>
+        </div>
+    </div>
+</div>
+
+<div id="step4" class="page">
+    <div class="blessing-container">
+        <div class="blessing-title">溪流回聲</div>
+        <div id="blessing-text">願你的生活如美崙溪般生生不息。</div>
+        <button id="btn-final-restart" class="btn-restart">再次留言</button>
+    </div>
+</div>
+
+<script type="module">
+const firebaseConfig = {
+    apiKey: "AIzaSyAk7_r7HGijcFBzTjameuieXoSCrBwrg0g",
+    authDomain: "uuu566-ec42d.firebaseapp.com",
+    projectId: "uuu566-ec42d",
+    storageBucket: "uuu566-ec42d.appspot.com",
+    messagingSenderId: "148385432205",
+    appId: "1:148385432205:web:5055eaaab6206e8c6b98c4"
+};
+
+let db = null;
+let firebaseAPI = null;
+
+async function initFirebase() {
+    if (firebaseAPI && db) return true;
+
+    try {
+        const appModule = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js");
+        const firestoreModule = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js");
+        const firebaseApp = appModule.initializeApp(firebaseConfig);
+        db = firestoreModule.getFirestore(firebaseApp);
+        firebaseAPI = firestoreModule;
+        return true;
+    } catch (err) {
+        console.warn("Firebase unavailable, using local exhibition mode.", err);
+        return false;
+    }
+}
+
+const blessings = [
+    "願你的生活如美崙溪般生生不息。",
+    "願溪水洗滌憂愁，帶回內心的寧靜。",
+    "願你在生活的每個角落，都能遇見屬於自己的湧泉。",
+    "根深葉茂，願你如河岸森林般韌性生長。",
+    "塊陶。",
+    "謝謝今天過來留言，祝福您今天都是綠燈通行順順利利。",
+    "好山好水好無聊。",
+    "你再繼續焦慮你會燒焦。",
+    "做設計當作出去玩散散心。",
+    "今天你睡了嗎。",
+    "你知道新秀展到6月1號結束嗎。",
+    "你知道花蓮有米老鼠嗎。",
+    "去找找屬於你的好躺的俗頭。",
+    "清流潤心，願你的前程如溪水般明亮透徹。",
+    "山高水長，願你歲月靜好，平安喜樂。",
+    "如溪匯海，願你所有的努力終能成就壯闊。",
+    "每一顆石子都有故事，每一段生命都有光芒。"
+];
+
+const fallbackMessages = [
+    { emoji: "💧", message: "今天的水聲很安靜。" },
+    { emoji: "🌿", message: "希望河岸一直是柔軟的。" },
+    { emoji: "⛰️", message: "從山到海都有人記得。" },
+    { emoji: "🐟", message: "願每次回游都有路。" },
+    { emoji: "💧", message: "把焦慮放進溪裡。" },
+    { emoji: "🌿", message: "願生活慢慢發芽。" }
+];
+
+const maxMessages = 15;
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#039;"
+    }[char]));
+}
+
+class PhysicsCard {
+    constructor(emoji, message, x, y, cw, ch) {
+        const mobile = window.innerWidth <= 900;
+        this.emoji = emoji;
+        this.message = message;
+        this.x = x;
+        this.y = y;
+        this.w = mobile ? 132 : 230;
+        this.h = mobile ? 92 : 152;
+        this.vx = (Math.random() - .5) * 4.8;
+        this.vy = Math.random() * .8;
+        this.mass = 1 + Math.random() * .25;
+        this.grav = mobile ? .34 : .42;
+        this.air = .985;
+        this.surfaceFriction = .86;
+        this.bounce = .16;
+        this.cw = cw;
+        this.ch = ch;
+        this.sleepFrames = 0;
+        this.isRest = false;
+    }
+
+    tick(cards) {
+        if (this.isRest) return;
+
+        this.vy += this.grav;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vx *= this.air;
+        this.vy *= this.air;
+
+        this.keepInside();
+
+        for (let i = 0; i < 4; i += 1) {
+            for (const other of cards) {
+                if (other !== this) this.resolveCollision(other);
+            }
+        }
+
+        this.checkSleep();
+    }
+
+    keepInside() {
+        if (this.x < 0) {
+            this.x = 0;
+            this.vx = Math.abs(this.vx) * this.bounce;
+        }
+
+        if (this.x + this.w > this.cw) {
+            this.x = this.cw - this.w;
+            this.vx = -Math.abs(this.vx) * this.bounce;
+        }
+
+        if (this.y + this.h >= this.ch) {
+            this.y = this.ch - this.h;
+            this.vy = -Math.abs(this.vy) * this.bounce;
+            this.vx *= this.surfaceFriction;
+        }
+    }
+
+    resolveCollision(other) {
+        const ax = this.x + this.w / 2;
+        const ay = this.y + this.h / 2;
+        const bx = other.x + other.w / 2;
+        const by = other.y + other.h / 2;
+        const dx = ax - bx;
+        const dy = ay - by;
+        const overlapX = (this.w + other.w) / 2 - Math.abs(dx);
+        const overlapY = (this.h + other.h) / 2 - Math.abs(dy);
+
+        if (overlapX <= 0 || overlapY <= 0) return;
+
+        const axisX = overlapX < overlapY;
+        const dir = axisX ? Math.sign(dx || .01) : Math.sign(dy || .01);
+        const correction = Math.max(0, (axisX ? overlapX : overlapY) - .8);
+        const totalMass = this.mass + other.mass;
+        const thisShare = other.mass / totalMass;
+        const otherShare = this.mass / totalMass;
+
+        if (axisX) {
+            this.x += dir * correction * thisShare;
+            other.x -= dir * correction * otherShare;
+            const impulse = (this.vx - other.vx) * .22;
+            this.vx -= impulse;
+            other.vx += impulse;
+        } else {
+            this.y += dir * correction * thisShare;
+            other.y -= dir * correction * otherShare;
+            const impulse = (this.vy - other.vy) * .18;
+            this.vy -= impulse;
+            other.vy += impulse;
+            this.vx += dir * .04;
+            other.vx -= dir * .04;
+        }
+
+        this.isRest = false;
+        other.isRest = false;
+        this.sleepFrames = 0;
+        other.sleepFrames = 0;
+        this.keepInside();
+        other.keepInside();
+    }
+
+    checkSleep() {
+        const onFloor = this.y + this.h >= this.ch - .75;
+        const calm = Math.abs(this.vx) < .055 && Math.abs(this.vy) < .08;
+
+        if (onFloor && calm) {
+            this.sleepFrames += 1;
+        } else {
+            this.sleepFrames = 0;
+        }
+
+        if (this.sleepFrames > 42) {
+            this.isRest = true;
+            this.vx = 0;
+            this.vy = 0;
+        }
+    }
+}
+
+const app = {
+    currentEmoji: null,
+    cards: [],
+    isSubmitting: false,
+    wallToken: 0,
+
+    init() {
+        this.bind();
+        this.animate();
+    },
+
+    bind() {
+        document.getElementById("btn-start").onclick = () => this.go(1);
+        document.querySelectorAll(".emoji-card").forEach(card => {
+            card.onclick = event => this.selectEmoji(event.currentTarget.dataset.emoji);
+        });
+        document.getElementById("messageInput").oninput = () => this.updateCount();
+        document.getElementById("btn-submit").onclick = () => this.submit();
+        document.getElementById("btn-to-blessing").onclick = () => this.showBlessing();
+        document.getElementById("btn-final-restart").onclick = () => this.go(0);
+        window.addEventListener("resize", () => this.resizeCards());
+    },
+
+    go(step) {
+        document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+        const target = step === 0 ? "cover" : "step" + step;
+        document.getElementById(target).classList.add("active");
+
+        if (step === 3) this.fetchWall();
+    },
+
+    selectEmoji(emoji) {
+        this.currentEmoji = emoji;
+        document.getElementById("selectedEmojiDisplay").textContent = emoji;
+        this.go(2);
+    },
+
+    updateCount() {
+        document.getElementById("charCount").textContent = document.getElementById("messageInput").value.length;
+    },
+
+    async submit() {
+        if (this.isSubmitting) return;
+
+        const input = document.getElementById("messageInput");
+        const text = input.value.trim();
+
+        if (!text || !this.currentEmoji) return;
+
+        this.isSubmitting = true;
+        const btn = document.getElementById("btn-submit");
+        btn.textContent = "送出中...";
+
+        try {
+            if (!await initFirebase()) throw new Error("Firebase unavailable");
+            await firebaseAPI.addDoc(firebaseAPI.collection(db, "messages"), {
+                emoji: this.currentEmoji,
+                message: text,
+                timestamp: firebaseAPI.serverTimestamp()
+            });
+        } catch (err) {
+            console.warn("Firebase write failed, rendering locally.", err);
+            fallbackMessages.push({
+                emoji: this.currentEmoji,
+                message: text
+            });
+
+            while (fallbackMessages.length > maxMessages) {
+                fallbackMessages.shift();
+            }
+        }
+
+        input.value = "";
+        this.updateCount();
+        btn.textContent = "潛入水中";
+        this.isSubmitting = false;
+        this.go(3);
+    },
+
+    showBlessing() {
+        const idx = Math.floor(Math.random() * blessings.length);
+        document.getElementById("blessing-text").innerText = blessings[idx];
+        this.go(4);
+    },
+
+    async fetchWall() {
+        const token = ++this.wallToken;
+        const canvas = document.getElementById("canvasArea");
+        canvas.innerHTML = '<div class="canvas-empty">讀取留言中...</div>';
+        this.cards = [];
+
+        let data = [];
+
+        try {
+            if (!await initFirebase()) throw new Error("Firebase unavailable");
+            const q = firebaseAPI.query(
+                firebaseAPI.collection(db, "messages"),
+                firebaseAPI.orderBy("timestamp", "desc"),
+                firebaseAPI.limit(maxMessages)
+            );
+            const snap = await firebaseAPI.getDocs(q);
+            snap.forEach(doc => data.push(doc.data()));
+            data.reverse();
+        } catch (err) {
+            console.warn("Firebase read failed, using fallback messages.", err);
+        }
+
+        if (!data.length) data = fallbackMessages;
+        data = data.slice(-maxMessages);
+        if (token !== this.wallToken) return;
+
+        canvas.innerHTML = "";
+        this.dropCards(data);
+    },
+
+    dropCards(data) {
+        const canvas = document.getElementById("canvasArea");
+        const cw = canvas.offsetWidth;
+        const ch = canvas.offsetHeight;
+        const mobile = window.innerWidth <= 900;
+        const cardWidth = mobile ? 132 : 230;
+        const gutter = mobile ? 12 : 24;
+
+        data.forEach((item, i) => {
+            setTimeout(() => {
+                if (!document.getElementById("step3").classList.contains("active")) return;
+
+                const spread = Math.max(gutter, cw - cardWidth - gutter * 2);
+                const startX = gutter + ((i * (cardWidth * .72)) % spread);
+                const jitter = (Math.random() - .5) * Math.min(110, spread * .18);
+                const card = new PhysicsCard(
+                    item.emoji || "💧",
+                    item.message || "",
+                    Math.max(gutter, Math.min(cw - cardWidth - gutter, startX + jitter)),
+                    -190 - Math.random() * 80,
+                    cw,
+                    ch
+                );
+
+                const el = document.createElement("div");
+                el.className = `message-card tone-${i % 3}`;
+                el.innerHTML = `
+                    <div class="card-number">#${i + 1}</div>
+                    <div class="message-emoji">${escapeHTML(card.emoji)}</div>
+                    <div class="message-text">${escapeHTML(card.message)}</div>
+                `;
+
+                canvas.appendChild(el);
+                card.el = el;
+                this.cards.push(card);
+            }, i * 150);
+        });
+    },
+
+    resizeCards() {
+        const canvas = document.getElementById("canvasArea");
+        if (!canvas || !this.cards.length) return;
+
+        const cw = canvas.offsetWidth;
+        const ch = canvas.offsetHeight;
+        const mobile = window.innerWidth <= 900;
+
+        this.cards.forEach(card => {
+            card.cw = cw;
+            card.ch = ch;
+            card.w = mobile ? 132 : 230;
+            card.h = mobile ? 92 : 152;
+            card.x = Math.min(card.x, Math.max(0, cw - card.w));
+            card.y = Math.min(card.y, Math.max(0, ch - card.h));
+            card.isRest = false;
+            card.sleepFrames = 0;
+        });
+    },
+
+    animate() {
+        if (document.getElementById("step3").classList.contains("active")) {
+            this.cards.forEach(card => {
+                card.tick(this.cards);
+
+                if (card.el) {
+                    card.el.style.left = `${card.x}px`;
+                    card.el.style.top = `${card.y}px`;
+                }
+            });
+        }
+
+        requestAnimationFrame(() => this.animate());
+    }
+};
+
+app.init();
+</script>
+</body>
+</html>
