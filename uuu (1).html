@@ -53,7 +53,7 @@
             transform: scale(1);
         }
 
-        /* ===== COVER 頁面 ===== */
+        /* ===== 首頁 (COVER) ===== */
         #cover {
             background: var(--primary-gradient);
             align-items: center;
@@ -94,6 +94,14 @@
             letter-spacing: 2px;
             animation: slideInUp 0.8s ease-out;
         }
+        
+        .cover-subtitle {
+            font-size: 20px;
+            opacity: 0.95;
+            margin-bottom: 40px;
+            line-height: 1.8;
+            animation: slideInUp 0.8s ease-out 0.1s backwards;
+        }
 
         .btn-start {
             display: inline-block;
@@ -112,7 +120,9 @@
         .btn-start:hover {
             background: var(--p325-cyan);
             color: white;
+            border-color: var(--p325-cyan);
             transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-lg);
         }
 
         .cover-preview {
@@ -142,11 +152,16 @@
             50% { transform: translateY(-20px) rotate(5deg); }
         }
 
-        /* ===== STEP1 & STEP2 ===== */
+        .preview-item:nth-child(2) { animation-delay: 1s; border-radius: 20% 50% 20% 50%; }
+        .preview-item:nth-child(3) { animation-delay: 2s; border-radius: 20% 50% 20% 50%; }
+        .preview-item:nth-child(4) { animation-delay: 3s; }
+
+        /* ===== STEP1 (選圖塊) & STEP2 (輸入留言) ===== */
         #step1, #step2 {
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            background: linear-gradient(to bottom, var(--bg-mist) 0%, #E0F2F1 100%);
             padding: 60px 40px;
         }
 
@@ -181,6 +196,7 @@
         .emoji-card:hover {
             transform: translateY(-15px);
             border-color: var(--p325-cyan);
+            box-shadow: 0 20px 40px rgba(85,198,217,0.2); 
         }
 
         .input-container {
@@ -202,6 +218,22 @@
             font-size: 17px;
             resize: none;
             background: rgba(255,255,255,0.7);
+            line-height: 1.6;
+            color: #3E2723;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--p360-green);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(0, 175, 63, 0.1);
+        }
+
+        .char-count {
+            text-align: right;
+            color: #8D6E63;
+            font-size: 15px;
+            margin-top: 10px;
         }
 
         .btn-submit {
@@ -215,9 +247,15 @@
             font-weight: 600;
             cursor: pointer;
             margin-top: 10px;
+            transition: 0.3s;
         }
 
-        /* ===== STEP3 動態牆 ===== */
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(85,198,217,0.3);
+        }
+
+        /* ===== STEP3 動態留言牆 ===== */
         #step3 {
             flex-direction: column;
             align-items: center;
@@ -239,11 +277,23 @@
             border: 2px solid rgba(255, 255, 255, 0.5);
         }
         
+        .gallery-container::after {
+            content: '';
+            position: absolute;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
+            border: 2px dashed rgba(0, 175, 63, 0.2);
+            border-radius: 32px;
+            pointer-events: none;
+        }
+
         .canvas-area {
             width: 100%;
             height: 100%;
             position: relative;
             overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(85,198,217,0.05) 0%, transparent 20%),
+                radial-gradient(circle at 80% 70%, rgba(0,175,63,0.05) 0%, transparent 25%);
         }
 
         .message-card {
@@ -263,14 +313,35 @@
             align-items: center;
             text-align: center;
         }
+        
+        .message-card:hover {
+            box-shadow: 0 15px 35px rgba(0, 175, 63, 0.25); 
+            border-color: var(--p360-green);
+        }
 
         .card-number {
             position: absolute;
             top: 12px;
             left: 18px;
             font-size: 14px;
-            color: rgba(0, 0, 0, 0.25);
+            color: rgba(0, 0, 0, 0.3);
             font-weight: 800;
+        }
+
+        .message-emoji {
+            font-size: 32px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .message-text {
+            color: #333333; 
+            font-weight: 500;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3; 
+            -webkit-box-orient: vertical;
+            line-height: 1.5;
         }
 
         .next-btn {
@@ -284,10 +355,18 @@
             border-radius: 50px;
             cursor: pointer;
             font-weight: 600;
+            font-size: 16px;
             z-index: 100;
+            box-shadow: 0 5px 15px rgba(0, 175, 63, 0.3);
+            transition: 0.3s;
         }
 
-        /* ===== 🔥 新增：STEP 4 祝福頁面樣式 🔥 ===== */
+        .next-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 10px 25px rgba(85,198,217,0.4);
+        }
+
+        /* ===== STEP4 隨機祝福頁面 ===== */
         #step4 {
             flex-direction: column;
             align-items: center;
@@ -298,7 +377,7 @@
         }
 
         .blessing-container {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             padding: 60px;
             border-radius: 40px;
             box-shadow: var(--shadow-xl);
@@ -309,15 +388,16 @@
         }
 
         .blessing-title {
-            font-family: "Noto Serif TC", serif;
+            font-family: "Microsoft JhengHei", serif;
             font-size: 24px;
             color: var(--p360-green);
             margin-bottom: 30px;
             letter-spacing: 4px;
+            font-weight: bold;
         }
 
         #blessing-text {
-            font-family: "Noto Serif TC", serif;
+            font-family: "Microsoft JhengHei", serif;
             font-size: 32px;
             color: var(--text-dark);
             line-height: 1.8;
@@ -335,19 +415,47 @@
             cursor: pointer;
             font-weight: 600;
             transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .btn-restart:hover {
             background: var(--p325-cyan);
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
-        /* 手機版適配 */
+        /* ===== 手機版介面適配 (響應式) ===== */
         @media (max-width: 768px) {
-            .cover-title { font-size: 40px; }
-            .message-card { width: 130px; height: 90px; }
-            #blessing-text { font-size: 22px; }
+            #cover { padding: 40px 20px; text-align: center; }
+            .cover-title { font-size: 40px; margin-top: 20px; }
+            .cover-subtitle { font-size: 16px; margin-bottom: 30px; }
+            .cover-preview { grid-template-columns: 1fr 1fr; padding-left: 0; width: 100%; max-width: 350px; margin-top: 30px; }
+            .preview-item { font-size: 60px; }
+            
+            #step1, #step2 { padding: 40px 20px; }
+            .step-title { font-size: 28px; margin-bottom: 30px; }
+            .emoji-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+            .emoji-card { font-size: 60px; border-radius: 20px; }
+            
+            .input-container { padding: 30px 20px; }
+            .step2-title { font-size: 20px; }
+            textarea { height: 110px; font-size: 16px; }
+            
+            .gallery-container { height: 75vh; border-radius: 30px; }
+            .next-btn { bottom: 25px; right: 25px; padding: 12px 20px; font-size: 14px; }
+            
+            /* 手機版縮小石頭尺寸 */
+            .message-card { 
+                width: 130px; 
+                height: 90px; 
+                padding: 10px; 
+                border-radius: 30px 20px 40px 25px / 25px 40px 20px 35px; 
+            }
+            .message-emoji { font-size: 20px; margin-bottom: 4px; }
+            .message-text { font-size: 12px; -webkit-line-clamp: 2; line-height: 1.4; }
+            .card-number { top: 8px; left: 12px; font-size: 10px; }
+            
             .blessing-container { padding: 40px 20px; }
+            #blessing-text { font-size: 22px; }
         }
     </style>
 </head>
@@ -381,6 +489,7 @@
             <div id="selectedEmojiDisplay" style="font-size: 70px; text-align: center; margin-bottom: 20px;"></div>
             <div class="step-title" style="font-size: 24px; margin-bottom: 20px; text-align: center;">你想對美崙溪說些什麼？</div>
             <textarea id="messageInput" placeholder="分享你的風景或回憶..." maxlength="50"></textarea>
+            <div class="char-count"><span id="charCount">0</span>/50</div>
             <button id="btn-submit" class="btn-submit">投入水中</button>
         </div>
     </div>
@@ -404,6 +513,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+        // Firebase 連線金鑰
         const firebaseConfig = {
             apiKey: "AIzaSyAk7_r7HGijcFBzTjameuieXoSCrBwrg0g",
             authDomain: "uuu566-ec42d.firebaseapp.com",
@@ -417,7 +527,7 @@
         const firebaseApp = initializeApp(firebaseConfig);
         const db = getFirestore(firebaseApp);
 
-        // 10 種隨機祝福話語
+        // 10 句專屬祝福語
         const blessings = [
             "願你的生活如美崙溪般生生不息。",
             "願溪水洗滌憂愁，帶回內心的寧靜。",
@@ -431,112 +541,243 @@
             "每一顆石子都有故事，每一段生命都有光芒。"
         ];
 
-        // 物理引擎
+        // 物理碰撞引擎
         class PhysicsCard {
             constructor(emoji, message, x, y, cw, ch) {
-                this.emoji = emoji; this.message = message;
-                this.x = x; this.y = y;
-                this.vx = (Math.random() - 0.5) * 6; this.vy = Math.random();
-                this.rot = Math.random() * 20 - 10; this.rv = (Math.random() - 0.5) * 0.12;
+                this.emoji = emoji; 
+                this.message = message;
+                this.x = x; 
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 6; 
+                this.vy = Math.random();
+                this.rot = Math.random() * 20 - 10; 
+                this.rv = (Math.random() - 0.5) * 0.12;
+                
+                // 動態判斷手機或電腦，調整碰撞箱尺寸，必須與 CSS 尺寸一致
                 const isMobile = window.innerWidth <= 768;
-                this.w = isMobile ? 130 : 240; this.h = isMobile ? 90 : 170;
-                this.grav = 0.35; this.fric = 0.99; this.bounce = 0.65;
-                this.isRest = false; this.cw = cw; this.ch = ch; this.el = null;
+                this.w = isMobile ? 130 : 240; 
+                this.h = isMobile ? 90 : 170;
+                
+                this.grav = 0.35; 
+                this.fric = 0.99; 
+                this.bounce = 0.65;
+                this.isRest = false; 
+                this.cw = cw; 
+                this.ch = ch; 
+                this.el = null;
             }
+
             update(cards) {
                 if (this.isRest) return;
-                this.vy += this.grav; this.x += this.vx; this.y += this.vy;
-                this.vx *= this.fric; this.vy *= this.fric;
+                
+                this.vy += this.grav; 
+                this.x += this.vx; 
+                this.y += this.vy;
+                this.vx *= this.fric; 
+                this.vy *= this.fric;
                 this.rot += this.rv;
-                if (this.x < 0) { this.x = 0; this.vx = Math.abs(this.vx) * this.bounce; }
-                if (this.x + this.w > this.cw) { this.x = this.cw - this.w; this.vx = -Math.abs(this.vx) * this.bounce; }
-                if (this.y + this.h >= this.ch) {
-                    this.y = this.ch - this.h; this.vy *= -this.bounce;
-                    if (Math.abs(this.vy) < 1.5) this.isRest = true;
+                
+                // 碰到左右牆壁反彈
+                if (this.x < 0) { 
+                    this.x = 0; 
+                    this.vx = Math.abs(this.vx) * this.bounce; 
                 }
+                if (this.x + this.w > this.cw) { 
+                    this.x = this.cw - this.w; 
+                    this.vx = -Math.abs(this.vx) * this.bounce; 
+                }
+                
+                // 石頭互相碰撞
+                for (let card of cards) {
+                    if (card === this) continue;
+                    if (this.checkCollisionAABB(card)) {
+                        this.resolveCollision(card);
+                    }
+                }
+
+                // 觸底判斷
+                if (this.y + this.h >= this.ch) {
+                    this.y = this.ch - this.h; 
+                    this.vy *= -this.bounce;
+                    // 當速度夠低時視為靜止
+                    if (Math.abs(this.vy) < 1.5 && Math.abs(this.vx) < 1.0) {
+                        this.isRest = true;
+                    }
+                }
+            }
+
+            checkCollisionAABB(other) {
+                return !(this.x + this.w < other.x ||
+                         this.x > other.x + other.w ||
+                         this.y + this.h < other.y ||
+                         this.y > other.y + other.h);
+            }
+
+            resolveCollision(other) {
+                const overlapLeft = (this.x + this.w) - other.x;
+                const overlapRight = (other.x + other.w) - this.x;
+                const overlapTop = (this.y + this.h) - other.y;
+                const overlapBottom = (other.y + other.h) - this.y;
+
+                const minOverlapX = Math.min(overlapLeft, overlapRight);
+                const minOverlapY = Math.min(overlapTop, overlapBottom);
+
+                if (minOverlapX < minOverlapY) {
+                    if (overlapLeft < overlapRight) {
+                        this.x = other.x - this.w;
+                        this.vx = -Math.abs(this.vx) * this.bounce;
+                        other.vx = Math.abs(other.vx) * this.bounce;
+                    } else {
+                        this.x = other.x + other.w;
+                        this.vx = Math.abs(this.vx) * this.bounce;
+                        other.vx = -Math.abs(other.vx) * this.bounce;
+                    }
+                } else {
+                    if (overlapTop < overlapBottom) {
+                        this.y = other.y - this.h;
+                        this.vy = -Math.abs(this.vy) * this.bounce;
+                        other.vy = Math.abs(other.vy) * this.bounce;
+                    } else {
+                        this.y = other.y + other.h;
+                        this.vy = Math.abs(this.vy) * this.bounce;
+                        other.vy = -Math.abs(other.vy) * this.bounce;
+                    }
+                }
+                this.rv += (this.vx - other.vx) * 0.02;
             }
         }
 
+        // 應用程式狀態管理
         const app = {
             currentEmoji: null,
             cards: [],
             isSubmitting: false,
+            
             init() {
                 this.bindEvents();
                 this.animate();
             },
+            
             bindEvents() {
+                // 綁定各個按鈕的點擊事件
                 document.getElementById('btn-start').onclick = () => this.goToStep(1);
+                
                 document.querySelectorAll('.emoji-card').forEach(card => {
                     card.onclick = (e) => this.selectEmoji(e.currentTarget.dataset.emoji);
                 });
+                
+                document.getElementById('messageInput').oninput = () => this.updateCharCount();
                 document.getElementById('btn-submit').onclick = () => this.submitMessage();
                 
-                // 重返岸邊 -> 顯示隨機祝福
+                // 第三頁點擊「重返岸邊」，隨機抽出祝福語，並前往第四頁
                 document.getElementById('btn-to-blessing').onclick = () => {
                     const randomIdx = Math.floor(Math.random() * blessings.length);
                     document.getElementById('blessing-text').textContent = blessings[randomIdx];
                     this.goToStep(4);
                 };
 
-                document.getElementById('btn-final-restart').onclick = () => this.goToStep(1);
+                // 第四頁點擊「再次開啟旅程」，回到首頁
+                document.getElementById('btn-final-restart').onclick = () => this.goToStep(0);
             },
+            
             goToStep(step) {
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                const target = document.getElementById('step' + step);
-                if(step === 0) document.getElementById('cover').classList.add('active');
-                else target.classList.add('active');
-                if(step === 3) this.fetchWall();
+                
+                if (step === 0) {
+                    document.getElementById('cover').classList.add('active');
+                } else {
+                    document.getElementById('step' + step).classList.add('active');
+                }
+                
+                // 如果切換到牆壁頁面，去資料庫抓資料
+                if (step === 3) this.fetchWall();
             },
+            
             selectEmoji(emoji) {
                 this.currentEmoji = emoji;
                 document.getElementById('selectedEmojiDisplay').textContent = emoji;
                 this.goToStep(2);
             },
+
+            updateCharCount() {
+                const count = document.getElementById('messageInput').value.length;
+                document.getElementById('charCount').textContent = count;
+            },
+            
             async submitMessage() {
                 if (this.isSubmitting) return;
                 const text = document.getElementById('messageInput').value.trim();
                 if (!text || !this.currentEmoji) return;
+                
                 this.isSubmitting = true;
+                const submitBtn = document.getElementById('btn-submit');
+                submitBtn.textContent = '投入溪流中...';
+
                 try {
                     await addDoc(collection(db, "messages"), {
-                        emoji: this.currentEmoji, message: text, timestamp: Date.now()
+                        emoji: this.currentEmoji, 
+                        message: text, 
+                        timestamp: Date.now()
                     });
+                    
                     document.getElementById('messageInput').value = '';
+                    this.updateCharCount();
                     this.isSubmitting = false;
+                    submitBtn.textContent = '投入水中';
                     this.goToStep(3);
-                } catch (e) { alert('連線失敗'); this.isSubmitting = false; }
+                } catch (e) { 
+                    alert('連線失敗，請檢查網路。'); 
+                    this.isSubmitting = false;
+                    submitBtn.textContent = '投入水中';
+                }
             },
+            
             async fetchWall() {
                 const canvas = document.getElementById('canvasArea');
-                canvas.innerHTML = '<div style="color:var(--text-dark); text-align:center; padding-top:50px;">水文記憶撈取中...</div>';
+                canvas.innerHTML = '<div style="color:var(--text-dark); text-align:center; padding-top:50px; font-size:24px; font-weight:bold;">水文記憶撈取中...</div>';
                 this.cards = [];
+                
                 try {
                     const q = query(collection(db, "messages"), orderBy("timestamp", "desc"), limit(20));
                     const snap = await getDocs(q);
                     const data = [];
                     snap.forEach(doc => data.push(doc.data()));
-                    data.reverse();
+                    data.reverse(); // 為了讓最新的在最後掉下來
+                    
                     canvas.innerHTML = '';
                     const cw = canvas.offsetWidth, ch = canvas.offsetHeight;
+                    const isMobile = window.innerWidth <= 768;
+                    const cardWidth = isMobile ? 130 : 240;
+
                     data.forEach((d, i) => {
                         setTimeout(() => {
-                            const card = new PhysicsCard(d.emoji, d.message, Math.random()*(cw-150), -200, cw, ch);
+                            const card = new PhysicsCard(d.emoji, d.message, Math.random()*(cw - cardWidth), -200, cw, ch);
                             const el = document.createElement('div');
                             el.className = 'message-card';
-                            el.innerHTML = `<div class="card-number">#${i+1}</div><span style="font-size:28px;">${card.emoji}</span><div style="font-size:14px; margin-top:10px;">${card.message}</div>`;
+                            // 加入石塊斑駁的背景效果
+                            el.style.background = `var(--card-rock) radial-gradient(circle at ${Math.random()*100}% ${Math.random()*100}%, rgba(0,0,0,0.03) 0%, transparent 10%)`;
+                            
+                            el.innerHTML = `
+                                <div class="card-number">#${i + 1}</div>
+                                <span class="message-emoji">${card.emoji}</span>
+                                <div class="message-text">${card.message}</div>
+                            `;
+                            
                             canvas.appendChild(el);
                             card.el = el;
                             this.cards.push(card);
-                        }, i * 200);
+                        }, i * 200); // 製造時間差掉落效果
                     });
-                } catch (e) { canvas.innerHTML = '載入失敗'; }
+                } catch (e) { 
+                    canvas.innerHTML = '<div style="color:var(--text-dark); text-align:center; padding-top:50px; font-size:20px;">載入失敗，天地失序。</div>'; 
+                }
             },
+            
             animate() {
-                const canvas = document.getElementById('canvasArea');
+                // 只有在處於第三頁(動態牆)時才去更新畫布，節省效能
                 if (document.getElementById('step3').classList.contains('active')) {
                     this.cards.forEach(c => {
-                        c.update();
+                        c.update(this.cards);
                         if (c.el) {
                             c.el.style.left = c.x + 'px';
                             c.el.style.top = c.y + 'px';
@@ -547,8 +788,9 @@
                 requestAnimationFrame(() => this.animate());
             }
         };
+
+        // 啟動應用程式
         app.init();
     </script>
 </body>
 </html>
-
