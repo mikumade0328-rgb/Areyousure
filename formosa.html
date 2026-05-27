@@ -544,7 +544,7 @@ textarea:focus {
 <div id="step3" class="page">
     <div class="wall-shell">
         <aside class="wall-aside">
-            <div class="wall-kicker">ForMoSac</div>
+            <div class="wall-kicker">ForMoSa</div>
             <div class="wall-title">記憶水路</div>
         </aside>
         <div class="gallery-container">
@@ -621,16 +621,14 @@ const fallbackMessages = [
 ];
 
 const maxMessages = 15;
+const desktopMaxMessages = 15;
+const mobileMaxMessages = 12;
 
-function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, char => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        "\"": "&quot;",
-        "'": "&#039;"
-    }[char]));
+function getMaxMessages() {
+    return window.innerWidth <= 900 ? mobileMaxMessages : desktopMaxMessages;
 }
+    function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
 
 class PhysicsCard {
     constructor(emoji, message, x, y, cw, ch) {
@@ -820,7 +818,7 @@ const app = {
                 message: text
             });
 
-            while (fallbackMessages.length > maxMessages) {
+             while (fallbackMessages.length > getMaxMessages()) {
                 fallbackMessages.shift();
             }
         }
@@ -852,6 +850,7 @@ const app = {
                 firebaseAPI.collection(db, "messages"),
                 firebaseAPI.orderBy("timestamp", "desc"),
                 firebaseAPI.limit(maxMessages)
+                firebaseAPI.limit(getMaxMessages())
             );
             const snap = await firebaseAPI.getDocs(q);
             snap.forEach(doc => data.push(doc.data()));
@@ -869,6 +868,7 @@ const app = {
     },
 
     dropCards(data) {
+    data = data.slice(-getMaxMessages());
         const canvas = document.getElementById("canvasArea");
         const cw = canvas.offsetWidth;
         const ch = canvas.offsetHeight;
