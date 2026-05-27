@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ForMoSa 花蓮美崙溪流域文化重織與韌性水路</title>
+<title>ForMoSac 花蓮美崙溪流域文化重織與韌性水路</title>
 <style>
 * {
     margin: 0;
@@ -12,28 +12,22 @@
 }
 
 :root {
-    --p325-cyan: #55C6D9;
-    --p360-green: #00AF3F;
-    --river-deep: #1B6F79;
-    --river-night: #173D45;
-    --moss: #5D8B4F;
-    --silt: #B9B49D;
-    --bg-mist: #F0F8F7;
-    --card-rock: #ECECE7;
-    --text-dark: #2C3E50;
-    --parchment: #FCFAF2;
-    --primary-gradient: linear-gradient(135deg, var(--p325-cyan) 0%, #A8E6CF 50%, var(--p360-green) 100%);
-    --button-gradient: linear-gradient(135deg, var(--p360-green) 0%, var(--p325-cyan) 100%);
-    --shadow-sm: 0 4px 6px rgba(0, 0, 0, .07);
-    --shadow-lg: 0 15px 30px rgba(0, 175, 63, .15);
-    --shadow-xl: 0 20px 40px rgba(0, 0, 0, .2);
+    --white: #FFFFFF;
+    --mist: #F2FAFA;
+    --ice-blue: #DFF5FA;
+    --water-blue: #55C6D9;
+    --soft-green: #CFEED9;
+    --green: #00AF3F;
+    --deep: #174A55;
+    --text: #243D42;
+    --shadow: 0 20px 45px rgba(23, 74, 85, .16);
 }
 
 body {
-    font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
+    font-family: "Microsoft JhengHei", sans-serif;
     overflow: hidden;
-    background: var(--bg-mist);
-    color: var(--text-dark);
+    background: var(--mist);
+    color: var(--text);
 }
 
 button,
@@ -50,8 +44,8 @@ textarea {
     justify-content: center;
     opacity: 0;
     visibility: hidden;
-    transform: scale(1.05);
-    transition: opacity .5s ease, transform .5s ease, visibility .5s;
+    transform: scale(1.03);
+    transition: opacity .45s ease, transform .45s ease, visibility .45s;
     z-index: 1;
 }
 
@@ -63,139 +57,120 @@ textarea {
 }
 
 #cover {
-    background: var(--primary-gradient);
-    justify-content: space-between;
-    padding: 60px 80px;
-    position: relative;
-    overflow: hidden;
-}
-
-#cover::before {
-    content: "";
-    position: absolute;
-    bottom: -50px;
-    left: 0;
-    width: 100%;
-    height: 300px;
-    background: rgba(255, 255, 255, .12);
-    border-radius: 50% 50% 0 0;
-}
-
-#cover::after {
-    content: "";
-    position: absolute;
-    inset: auto -20% -26% -20%;
-    height: 50%;
-    background: radial-gradient(ellipse at center, rgba(255,255,255,.28), rgba(255,255,255,0) 68%);
-    animation: slowDrift 12s ease-in-out infinite;
+    justify-content: flex-end;
+    align-items: stretch;
+    padding: clamp(24px, 4vw, 64px);
+    background:
+        linear-gradient(90deg, rgba(15, 66, 75, .76), rgba(15, 66, 75, .22) 55%, rgba(255,255,255,.1)),
+        url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Meilun%20River%20%E7%BE%8E%E5%B4%99%E6%BA%AA%20%EF%BC%88Hualien%2C%20Taiwan%29.jpg") center / cover no-repeat;
 }
 
 .cover-content {
-    flex: 1;
-    color: white;
+    position: relative;
     z-index: 2;
+    width: min(760px, 100%);
+    color: var(--white);
 }
 
 .cover-title {
-    font-size: clamp(42px, 6vw, 72px);
-    font-weight: 700;
+    font-size: clamp(46px, 7vw, 86px);
+    line-height: 1.05;
+    font-weight: 800;
     letter-spacing: 0;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 .cover-subtitle {
-    font-size: 20px;
+    font-size: clamp(18px, 2vw, 24px);
     line-height: 1.8;
-    margin-bottom: 40px;
+    margin-bottom: 32px;
+}
+
+.intro-panel {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.intro-item {
+    min-height: 92px;
+    padding: 18px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.9);
+    color: var(--deep);
+    box-shadow: 0 12px 28px rgba(0,0,0,.1);
+}
+
+.intro-item strong {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--green);
+    font-size: 16px;
+}
+
+.intro-item span {
+    display: block;
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.photo-credit {
+    position: absolute;
+    right: 18px;
+    bottom: 12px;
+    color: rgba(255,255,255,.78);
+    font-size: 11px;
 }
 
 .btn-start,
 .btn-submit,
 .next-btn,
 .btn-restart {
-    border: none;
+    border: 0;
     cursor: pointer;
-    transition: transform .25s ease, filter .25s ease, background .25s ease;
+    border-radius: 999px;
+    font-weight: 700;
+    transition: transform .2s ease, filter .2s ease;
 }
 
 .btn-start {
-    padding: 18px 50px;
-    border-radius: 999px;
-    background: white;
-    color: var(--p360-green);
+    padding: 16px 42px;
+    background: var(--white);
+    color: var(--green);
     font-size: 18px;
-    font-weight: 700;
 }
 
 .btn-start:hover,
 .btn-submit:hover,
 .next-btn:hover,
 .btn-restart:hover {
-    transform: translateY(-4px);
+    transform: translateY(-3px);
     filter: brightness(1.03);
-}
-
-.cover-preview {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    width: 100%;
-    max-width: 500px;
-    z-index: 2;
-}
-
-.preview-item {
-    aspect-ratio: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 90px;
-    background: rgba(255, 255, 255, .18);
-    border-radius: 32px;
-    backdrop-filter: blur(5px);
-    animation: float 6s ease-in-out infinite;
-}
-
-.preview-item:nth-child(2) {
-    animation-delay: 1s;
-}
-
-.preview-item:nth-child(3) {
-    animation-delay: 2s;
-}
-
-.preview-item:nth-child(4) {
-    animation-delay: 3s;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
-}
-
-@keyframes slowDrift {
-    0%, 100% { transform: translateX(-4%); }
-    50% { transform: translateX(4%); }
 }
 
 #step1,
 #step2 {
-    background: linear-gradient(to bottom, var(--bg-mist) 0%, #E0F2F1 100%);
-    padding: 60px 20px;
+    padding: 40px 20px;
+    background:
+        linear-gradient(135deg, rgba(85,198,217,.22), transparent 40%),
+        linear-gradient(180deg, var(--white), var(--ice-blue));
 }
 
 .step-title {
-    font-size: 36px;
-    margin-bottom: 40px;
+    margin-bottom: 34px;
+    color: var(--deep);
+    font-size: clamp(26px, 4vw, 38px);
+    font-weight: 800;
     letter-spacing: 0;
+    text-align: center;
 }
 
 .emoji-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 30px;
-    max-width: 800px;
+    gap: 18px;
+    width: min(820px, 92vw);
 }
 
 .emoji-card {
@@ -203,146 +178,119 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 90px;
-    background: white;
-    border-radius: 26px;
+    background: var(--white);
+    border: 2px solid rgba(85,198,217,.28);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
     cursor: pointer;
-    transition: transform .3s ease, box-shadow .3s ease;
-    box-shadow: var(--shadow-sm);
+    font-size: clamp(58px, 8vw, 92px);
+    transition: transform .22s ease, border-color .22s ease;
 }
 
 .emoji-card:hover {
-    transform: translateY(-10px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-8px);
+    border-color: var(--green);
 }
 
 .input-container {
-    width: 100%;
-    max-width: 650px;
-    background: var(--parchment);
-    border-radius: 24px;
-    padding: 40px;
-    box-shadow: var(--shadow-xl);
+    width: min(660px, 92vw);
+    padding: clamp(28px, 4vw, 44px);
+    background: var(--white);
+    border: 2px solid rgba(85,198,217,.22);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+#selectedEmojiDisplay {
+    margin-bottom: 18px;
+    text-align: center;
+    font-size: 68px;
 }
 
 textarea {
     width: 100%;
     height: 140px;
     resize: none;
-    padding: 20px;
-    border-radius: 18px;
-    border: 2px solid #ddd;
+    padding: 18px;
+    border: 2px solid rgba(85,198,217,.32);
+    border-radius: 8px;
+    background: #FBFEFE;
+    color: var(--text);
     font-size: 17px;
     line-height: 1.6;
-    background: rgba(255,255,255,.9);
 }
 
 textarea:focus {
-    outline: none;
-    border-color: var(--p360-green);
+    outline: 0;
+    border-color: var(--green);
 }
 
 .char-count {
-    text-align: right;
     margin-top: 8px;
-    color: rgba(44,62,80,.65);
+    text-align: right;
+    color: rgba(36,61,66,.62);
 }
 
 .btn-submit {
     width: 100%;
-    margin-top: 18px;
+    margin-top: 16px;
     padding: 16px;
-    border-radius: 999px;
-    background: var(--button-gradient);
-    color: white;
+    background: linear-gradient(135deg, var(--green), var(--water-blue));
+    color: var(--white);
     font-size: 18px;
-    font-weight: 700;
 }
 
 #step3 {
-    background:
-        radial-gradient(circle at 72% 18%, rgba(85,198,217,.26), transparent 26%),
-        linear-gradient(140deg, #D7F2EC 0%, #E9F7EA 42%, #B9DCD9 100%);
     padding: clamp(18px, 3vw, 38px);
-    overflow: hidden;
+    background:
+        linear-gradient(90deg, rgba(255,255,255,.76), rgba(255,255,255,.2)),
+        linear-gradient(135deg, var(--ice-blue), var(--soft-green));
 }
 
 .wall-shell {
     width: min(1500px, 96vw);
     height: min(860px, 88vh);
     display: grid;
-    grid-template-columns: minmax(220px, 330px) minmax(0, 1fr);
-    gap: clamp(18px, 3vw, 36px);
-    align-items: stretch;
+    grid-template-columns: minmax(210px, 320px) minmax(0, 1fr);
+    gap: clamp(18px, 3vw, 34px);
 }
 
 .wall-aside {
-    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: clamp(24px, 3vw, 42px) 0;
-    color: var(--river-night);
+    padding: clamp(20px, 3vw, 42px) 0;
+    color: var(--deep);
 }
 
 .wall-kicker {
     writing-mode: vertical-rl;
-    align-self: flex-start;
+    color: var(--green);
     font-size: 14px;
     letter-spacing: .18em;
-    color: rgba(23,61,69,.58);
 }
 
 .wall-title {
     writing-mode: vertical-rl;
-    text-orientation: mixed;
     align-self: center;
     max-height: 66vh;
     font-size: clamp(34px, 5vw, 68px);
-    line-height: 1.1;
+    line-height: 1.12;
     font-weight: 800;
     letter-spacing: .08em;
 }
 
-.wall-meta {
-    width: 100%;
-    display: grid;
-    gap: 12px;
-    font-size: 14px;
-    color: rgba(23,61,69,.7);
-}
-
-.wall-meta span {
-    display: block;
-    height: 2px;
-    width: 100%;
-    background: linear-gradient(90deg, var(--river-deep), rgba(27,111,121,0));
-}
-
 .gallery-container {
+    position: relative;
     min-width: 0;
     height: 100%;
-    background:
-        linear-gradient(110deg, rgba(255,255,255,.58), rgba(255,255,255,.28)),
-        linear-gradient(180deg, rgba(85,198,217,.16), rgba(0,175,63,.12));
-    border: 1px solid rgba(255,255,255,.72);
-    border-radius: 28px;
     overflow: hidden;
-    position: relative;
-    backdrop-filter: blur(14px);
-    box-shadow: 0 24px 70px rgba(21,91,101,.22);
-}
-
-.gallery-container::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
+    border: 2px solid rgba(85,198,217,.26);
+    border-radius: 8px;
     background:
-        repeating-linear-gradient(100deg, rgba(255,255,255,.16) 0 2px, transparent 2px 52px),
-        radial-gradient(ellipse at 50% 102%, rgba(92,118,76,.32), transparent 45%);
-    mix-blend-mode: screen;
-    opacity: .7;
+        linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,255,255,.5)),
+        linear-gradient(135deg, var(--ice-blue), var(--soft-green));
+    box-shadow: var(--shadow);
 }
 
 .canvas-area {
@@ -350,7 +298,6 @@ textarea:focus {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    isolation: isolate;
 }
 
 .canvas-area::before {
@@ -359,161 +306,141 @@ textarea:focus {
     inset: 0;
     pointer-events: none;
     background:
-        linear-gradient(90deg, rgba(255,255,255,.18), transparent 32%, rgba(255,255,255,.13) 68%, transparent),
-        repeating-radial-gradient(ellipse at 50% 120%, rgba(32,91,84,.18) 0 2px, transparent 2px 28px);
-    animation: waterSweep 10s linear infinite;
-    z-index: 0;
+        linear-gradient(90deg, rgba(85,198,217,.18) 0 18%, transparent 18% 36%, rgba(0,175,63,.1) 36% 52%, transparent 52% 100%);
+    background-size: 280px 100%;
+    animation: waterMove 12s linear infinite;
+    opacity: .55;
+}
+
+@keyframes waterMove {
+    from { background-position: 0 0; }
+    to { background-position: 280px 0; }
 }
 
 .canvas-empty {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    color: rgba(23,61,69,.72);
-    font-size: clamp(18px, 2vw, 25px);
     z-index: 2;
-}
-
-@keyframes waterSweep {
-    from { background-position: 0 0, 0 0; }
-    to { background-position: 240px 0, 0 48px; }
+    transform: translate(-50%, -50%);
+    color: rgba(23,74,85,.72);
+    font-size: clamp(18px, 2vw, 24px);
 }
 
 .message-card {
     position: absolute;
     width: 230px;
-    min-height: 154px;
-    padding: 22px 20px 20px;
-    border-radius: 28px 32px 25px 35px;
-    background:
-        radial-gradient(circle at 18% 16%, rgba(255,255,255,.92), rgba(255,255,255,0) 30%),
-        linear-gradient(145deg, #F2F1EA, #CFCDBE 58%, #B8B5A3 100%);
-    box-shadow:
-        inset -10px -12px 24px rgba(78,76,60,.15),
-        inset 10px 12px 20px rgba(255,255,255,.42),
-        0 14px 26px rgba(28,63,58,.2);
-    text-align: center;
+    min-height: 152px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    will-change: transform, left, top;
-    z-index: 2;
+    padding: 22px 20px 20px;
+    border: 2px solid rgba(23,74,85,.08);
+    border-radius: 8px;
+    background: var(--white);
+    box-shadow: 0 14px 28px rgba(23,74,85,.14);
+    text-align: center;
     user-select: none;
+    z-index: 2;
 }
 
-.message-card::after {
-    content: "";
-    position: absolute;
-    inset: 9px;
-    border-radius: inherit;
-    border: 1px solid rgba(255,255,255,.32);
-    pointer-events: none;
+.message-card.tone-1 {
+    background: var(--ice-blue);
+}
+
+.message-card.tone-2 {
+    background: var(--soft-green);
 }
 
 .card-number {
     position: absolute;
-    top: 13px;
-    left: 18px;
+    top: 12px;
+    left: 16px;
+    color: rgba(23,74,85,.48);
     font-size: 12px;
-    color: rgba(38,52,48,.38);
 }
 
 .message-emoji {
+    margin-bottom: 10px;
     font-size: 34px;
     line-height: 1;
-    margin-bottom: 10px;
-    filter: drop-shadow(0 2px 2px rgba(0,0,0,.12));
 }
 
 .message-text {
     width: 100%;
-    color: #34433F;
-    line-height: 1.5;
-    font-size: 16px;
     overflow: hidden;
     overflow-wrap: anywhere;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+    color: var(--deep);
+    font-size: 16px;
+    line-height: 1.5;
 }
 
 .next-btn {
     position: absolute;
-    right: 26px;
-    bottom: 24px;
-    padding: 15px 28px;
-    border-radius: 999px;
-    background: var(--button-gradient);
-    color: white;
-    font-weight: 700;
-    box-shadow: 0 12px 28px rgba(0,90,90,.22);
-    z-index: 4;
+    right: 24px;
+    bottom: 22px;
+    z-index: 5;
+    padding: 14px 26px;
+    background: var(--green);
+    color: var(--white);
+    box-shadow: 0 12px 24px rgba(0, 175, 63, .2);
 }
 
 #step4 {
-    background: var(--primary-gradient);
+    background:
+        linear-gradient(135deg, rgba(85,198,217,.28), rgba(0,175,63,.2)),
+        var(--white);
 }
 
 .blessing-container {
-    width: 90%;
-    max-width: 700px;
-    background: rgba(255, 255, 255, .96);
-    padding: 60px;
-    border-radius: 34px;
+    width: min(700px, 90vw);
+    padding: clamp(34px, 5vw, 60px);
+    border: 2px solid rgba(85,198,217,.24);
+    border-radius: 8px;
+    background: var(--white);
+    box-shadow: var(--shadow);
     text-align: center;
-    box-shadow: var(--shadow-xl);
 }
 
 .blessing-title {
-    color: var(--p360-green);
-    margin-bottom: 30px;
+    margin-bottom: 28px;
+    color: var(--green);
     font-size: 24px;
+    font-weight: 800;
 }
 
 #blessing-text {
-    font-size: 32px;
+    margin-bottom: 36px;
+    color: var(--deep);
+    font-size: clamp(22px, 4vw, 32px);
     line-height: 1.8;
-    margin-bottom: 40px;
 }
 
 .btn-restart {
-    padding: 16px 36px;
-    border-radius: 999px;
-    background: var(--p360-green);
-    color: white;
-    font-weight: 700;
+    padding: 15px 34px;
+    background: var(--water-blue);
+    color: var(--white);
 }
 
 @media (max-width: 900px) {
     #cover {
-        padding: 40px 20px;
-        text-align: center;
+        padding: 28px 20px 40px;
     }
 
-    .cover-preview {
-        margin-top: 30px;
+    .intro-panel {
+        grid-template-columns: 1fr;
     }
 
-    .preview-item {
-        font-size: 60px;
-        border-radius: 24px;
-    }
-
-    .step-title {
-        font-size: 26px;
-        text-align: center;
+    .intro-item {
+        min-height: auto;
     }
 
     .emoji-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-    }
-
-    .emoji-card {
-        font-size: 60px;
-        border-radius: 22px;
     }
 
     .wall-shell {
@@ -524,37 +451,25 @@ textarea:focus {
     }
 
     .wall-aside {
-        min-height: auto;
         flex-direction: row;
-        align-items: end;
-        padding: 0 4px;
+        align-items: flex-end;
+        padding: 0 2px;
     }
 
     .wall-kicker,
     .wall-title {
         writing-mode: horizontal-tb;
-        text-orientation: initial;
     }
 
     .wall-title {
         font-size: 28px;
-        line-height: 1.2;
         letter-spacing: 0;
-    }
-
-    .wall-meta {
-        display: none;
-    }
-
-    .gallery-container {
-        border-radius: 22px;
     }
 
     .message-card {
         width: 132px;
         min-height: 92px;
         padding: 12px 10px 10px;
-        border-radius: 18px 21px 16px 20px;
     }
 
     .card-number {
@@ -564,8 +479,8 @@ textarea:focus {
     }
 
     .message-emoji {
-        font-size: 20px;
         margin-bottom: 5px;
+        font-size: 20px;
     }
 
     .message-text {
@@ -575,19 +490,9 @@ textarea:focus {
     }
 
     .next-btn {
-        right: 16px;
-        bottom: 16px;
+        right: 14px;
+        bottom: 14px;
         padding: 12px 20px;
-    }
-
-    .input-container,
-    .blessing-container {
-        padding: 32px 22px;
-        border-radius: 24px;
-    }
-
-    #blessing-text {
-        font-size: 22px;
     }
 }
 </style>
@@ -596,37 +501,43 @@ textarea:focus {
 <div id="cover" class="page active">
     <div class="cover-content">
         <div class="cover-title">河川記憶</div>
-        <div class="cover-subtitle">
-            寫下你與這片水域的故事<br />
-            讓每一抹思緒，化作水文間的洄盪
+        <div class="cover-subtitle">花蓮美崙溪流域文化重織與韌性水路</div>
+        <div class="intro-panel">
+            <div class="intro-item">
+                <strong>流域記憶</strong>
+                <span>收集觀者與美崙溪的片段感受。</span>
+            </div>
+            <div class="intro-item">
+                <strong>文化重織</strong>
+                <span>讓留言成為共同生成的水路地景。</span>
+            </div>
+            <div class="intro-item">
+                <strong>韌性水路</strong>
+                <span>以互動牆呈現溪流、城市與人的連結。</span>
+            </div>
         </div>
-        <button id="btn-start" class="btn-start">潛入溪流</button>
+        <button id="btn-start" class="btn-start">開始留言</button>
     </div>
-    <div class="cover-preview" aria-hidden="true">
-        <div class="preview-item">魚</div>
-        <div class="preview-item">草</div>
-        <div class="preview-item">山</div>
-        <div class="preview-item">水</div>
-    </div>
+    <div class="photo-credit">Photo: Evan Centanni / CC BY 4.0</div>
 </div>
 
 <div id="step1" class="page">
-    <div class="step-title">請選擇代表你的溪流生靈</div>
+    <div class="step-title">選擇一個溪流符號</div>
     <div class="emoji-grid">
-        <div class="emoji-card" data-emoji="魚">魚</div>
-        <div class="emoji-card" data-emoji="草">草</div>
-        <div class="emoji-card" data-emoji="山">山</div>
-        <div class="emoji-card" data-emoji="水">水</div>
+        <div class="emoji-card" data-emoji="🐟">🐟</div>
+        <div class="emoji-card" data-emoji="🌿">🌿</div>
+        <div class="emoji-card" data-emoji="⛰️">⛰️</div>
+        <div class="emoji-card" data-emoji="💧">💧</div>
     </div>
 </div>
 
 <div id="step2" class="page">
     <div class="input-container">
-        <div id="selectedEmojiDisplay" style="font-size:70px;text-align:center;margin-bottom:20px;"></div>
-        <div class="step-title" style="font-size:24px;text-align:center;margin-bottom:20px;">你想對我們說些什麼？</div>
-        <textarea id="messageInput" maxlength="50" placeholder="分享你現在的心境與感想..."></textarea>
+        <div id="selectedEmojiDisplay"></div>
+        <div class="step-title" style="font-size:24px;margin-bottom:20px;">留下你的河川記憶</div>
+        <textarea id="messageInput" maxlength="50" placeholder="輸入 50 字以內的留言"></textarea>
         <div class="char-count"><span id="charCount">0</span>/50</div>
-        <button id="btn-submit" class="btn-submit">投入水中</button>
+        <button id="btn-submit" class="btn-submit">送出留言</button>
     </div>
 </div>
 
@@ -635,39 +546,23 @@ textarea:focus {
         <aside class="wall-aside">
             <div class="wall-kicker">ForMoSac</div>
             <div class="wall-title">美崙溪記憶水路</div>
-            <div class="wall-meta">
-                <span></span>
-                <p>Hualien Meilun River</p>
-            </div>
         </aside>
         <div class="gallery-container">
             <div class="canvas-area" id="canvasArea"></div>
-            <button id="btn-to-blessing" class="next-btn">重返岸邊</button>
+            <button id="btn-to-blessing" class="next-btn">完成</button>
         </div>
     </div>
 </div>
 
 <div id="step4" class="page">
     <div class="blessing-container">
-        <div class="blessing-title">溪流的迴響</div>
+        <div class="blessing-title">溪流回聲</div>
         <div id="blessing-text">願你的生活如美崙溪般生生不息。</div>
-        <button id="btn-final-restart" class="btn-restart">再次開啟旅程</button>
+        <button id="btn-final-restart" class="btn-restart">再次留言</button>
     </div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import {
-    getFirestore,
-    collection,
-    addDoc,
-    getDocs,
-    query,
-    orderBy,
-    limit,
-    serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
 const firebaseConfig = {
     apiKey: "AIzaSyAk7_r7HGijcFBzTjameuieXoSCrBwrg0g",
     authDomain: "uuu566-ec42d.firebaseapp.com",
@@ -677,36 +572,46 @@ const firebaseConfig = {
     appId: "1:148385432205:web:5055eaaab6206e8c6b98c4"
 };
 
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp);
+let db = null;
+let firebaseAPI = null;
+
+async function initFirebase() {
+    if (firebaseAPI && db) return true;
+
+    try {
+        const appModule = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js");
+        const firestoreModule = await import("https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js");
+        const firebaseApp = appModule.initializeApp(firebaseConfig);
+        db = firestoreModule.getFirestore(firebaseApp);
+        firebaseAPI = firestoreModule;
+        return true;
+    } catch (err) {
+        console.warn("Firebase unavailable, using local exhibition mode.", err);
+        return false;
+    }
+}
 
 const blessings = [
     "願你的生活如美崙溪般生生不息。",
     "願溪水洗滌憂愁，帶回內心的寧靜。",
     "願你在生活的每個角落，都能遇見屬於自己的湧泉。",
     "根深葉茂，願你如河岸森林般韌性生長。",
-    "如狐蝠尋得棲林，願你也找到心之所向的歸屬。",
     "清流潤心，願你的前程如溪水般明亮透徹。",
     "山高水長，願你歲月靜好，平安喜樂。",
     "如溪匯海，願你所有的努力終能成就壯闊。",
-    "積蓄山澗之力，勇敢跨越每一道生命的轉折。",
-    "每一顆石子都有故事，每一段生命都有光芒。",
-    "今天你睡了嗎。",
-    "你知道新秀展到6月1號結束嗎。",
-    "塊陶。",
-    "做設計當作出去玩散散心。",
-    "你再繼續焦慮你會燒焦。",
-    "謝謝今天過來留言，祝福您今天都是綠燈通行順順利利。"
+    "每一顆石子都有故事，每一段生命都有光芒。"
 ];
 
 const fallbackMessages = [
-    { emoji: "水", message: "今天的水聲很安靜。" },
-    { emoji: "草", message: "希望河岸一直是柔軟的。" },
-    { emoji: "山", message: "從山到海都有人記得。" },
-    { emoji: "魚", message: "願每次回游都有路。" },
-    { emoji: "水", message: "把焦慮放進溪裡。" },
-    { emoji: "草", message: "願生活慢慢發芽。" }
+    { emoji: "💧", message: "今天的水聲很安靜。" },
+    { emoji: "🌿", message: "希望河岸一直是柔軟的。" },
+    { emoji: "⛰️", message: "從山到海都有人記得。" },
+    { emoji: "🐟", message: "願每次回游都有路。" },
+    { emoji: "💧", message: "把焦慮放進溪裡。" },
+    { emoji: "🌿", message: "願生活慢慢發芽。" }
 ];
+
+const maxMessages = 15;
 
 function escapeHTML(value) {
     return String(value ?? "").replace(/[&<>"']/g, char => ({
@@ -719,19 +624,17 @@ function escapeHTML(value) {
 }
 
 class PhysicsCard {
-    constructor(emoji, message, x, y, cw, ch, index) {
+    constructor(emoji, message, x, y, cw, ch) {
         const mobile = window.innerWidth <= 900;
         this.emoji = emoji;
         this.message = message;
         this.x = x;
         this.y = y;
         this.w = mobile ? 132 : 230;
-        this.h = mobile ? 92 : 154;
-        this.vx = (Math.random() - .5) * 5.2;
+        this.h = mobile ? 92 : 152;
+        this.vx = (Math.random() - .5) * 4.8;
         this.vy = Math.random() * .8;
-        this.rot = Math.random() * 22 - 11;
-        this.rv = (Math.random() - .5) * .22;
-        this.mass = 1 + Math.random() * .3;
+        this.mass = 1 + Math.random() * .25;
         this.grav = mobile ? .34 : .42;
         this.air = .985;
         this.surfaceFriction = .86;
@@ -740,7 +643,6 @@ class PhysicsCard {
         this.ch = ch;
         this.sleepFrames = 0;
         this.isRest = false;
-        this.index = index;
     }
 
     tick(cards) {
@@ -751,15 +653,12 @@ class PhysicsCard {
         this.y += this.vy;
         this.vx *= this.air;
         this.vy *= this.air;
-        this.rot += this.rv;
-        this.rv *= .94;
 
         this.keepInside();
 
         for (let i = 0; i < 4; i += 1) {
             for (const other of cards) {
-                if (other === this) continue;
-                this.resolveCollision(other);
+                if (other !== this) this.resolveCollision(other);
             }
         }
 
@@ -777,16 +676,10 @@ class PhysicsCard {
             this.vx = -Math.abs(this.vx) * this.bounce;
         }
 
-        if (this.y < -260) {
-            this.y = -260;
-            this.vy = Math.max(this.vy, 0);
-        }
-
         if (this.y + this.h >= this.ch) {
             this.y = this.ch - this.h;
             this.vy = -Math.abs(this.vy) * this.bounce;
             this.vx *= this.surfaceFriction;
-            this.rv *= .74;
         }
     }
 
@@ -804,12 +697,10 @@ class PhysicsCard {
 
         const axisX = overlapX < overlapY;
         const dir = axisX ? Math.sign(dx || .01) : Math.sign(dy || .01);
-        const push = axisX ? overlapX : overlapY;
+        const correction = Math.max(0, (axisX ? overlapX : overlapY) - .8);
         const totalMass = this.mass + other.mass;
         const thisShare = other.mass / totalMass;
         const otherShare = this.mass / totalMass;
-        const slop = .8;
-        const correction = Math.max(0, push - slop);
 
         if (axisX) {
             this.x += dir * correction * thisShare;
@@ -823,12 +714,10 @@ class PhysicsCard {
             const impulse = (this.vy - other.vy) * .18;
             this.vy -= impulse;
             other.vy += impulse;
-            this.vx += dir * .05;
-            other.vx -= dir * .05;
+            this.vx += dir * .04;
+            other.vx -= dir * .04;
         }
 
-        this.rv += dir * .006;
-        other.rv -= dir * .006;
         this.isRest = false;
         other.isRest = false;
         this.sleepFrames = 0;
@@ -839,7 +728,7 @@ class PhysicsCard {
 
     checkSleep() {
         const onFloor = this.y + this.h >= this.ch - .75;
-        const calm = Math.abs(this.vx) < .055 && Math.abs(this.vy) < .08 && Math.abs(this.rv) < .004;
+        const calm = Math.abs(this.vx) < .055 && Math.abs(this.vy) < .08;
 
         if (onFloor && calm) {
             this.sleepFrames += 1;
@@ -851,7 +740,6 @@ class PhysicsCard {
             this.isRest = true;
             this.vx = 0;
             this.vy = 0;
-            this.rv = 0;
         }
     }
 }
@@ -869,16 +757,13 @@ const app = {
 
     bind() {
         document.getElementById("btn-start").onclick = () => this.go(1);
-
         document.querySelectorAll(".emoji-card").forEach(card => {
             card.onclick = event => this.selectEmoji(event.currentTarget.dataset.emoji);
         });
-
         document.getElementById("messageInput").oninput = () => this.updateCount();
         document.getElementById("btn-submit").onclick = () => this.submit();
         document.getElementById("btn-to-blessing").onclick = () => this.showBlessing();
         document.getElementById("btn-final-restart").onclick = () => this.go(0);
-
         window.addEventListener("resize", () => this.resizeCards());
     },
 
@@ -887,9 +772,7 @@ const app = {
         const target = step === 0 ? "cover" : "step" + step;
         document.getElementById(target).classList.add("active");
 
-        if (step === 3) {
-            this.fetchWall();
-        }
+        if (step === 3) this.fetchWall();
     },
 
     selectEmoji(emoji) {
@@ -911,15 +794,15 @@ const app = {
         if (!text || !this.currentEmoji) return;
 
         this.isSubmitting = true;
-
         const btn = document.getElementById("btn-submit");
-        btn.textContent = "投入溪流中...";
+        btn.textContent = "送出中...";
 
         try {
-            await addDoc(collection(db, "messages"), {
+            if (!await initFirebase()) throw new Error("Firebase unavailable");
+            await firebaseAPI.addDoc(firebaseAPI.collection(db, "messages"), {
                 emoji: this.currentEmoji,
                 message: text,
-                timestamp: serverTimestamp()
+                timestamp: firebaseAPI.serverTimestamp()
             });
         } catch (err) {
             console.warn("Firebase write failed, rendering locally.", err);
@@ -927,11 +810,15 @@ const app = {
                 emoji: this.currentEmoji,
                 message: text
             });
+
+            while (fallbackMessages.length > maxMessages) {
+                fallbackMessages.shift();
+            }
         }
 
         input.value = "";
         this.updateCount();
-        btn.textContent = "投入水中";
+        btn.textContent = "送出留言";
         this.isSubmitting = false;
         this.go(3);
     },
@@ -945,24 +832,27 @@ const app = {
     async fetchWall() {
         const token = ++this.wallToken;
         const canvas = document.getElementById("canvasArea");
-        canvas.innerHTML = '<div class="canvas-empty">水文記憶撈取中...</div>';
+        canvas.innerHTML = '<div class="canvas-empty">讀取留言中...</div>';
         this.cards = [];
 
         let data = [];
 
         try {
-            const q = query(collection(db, "messages"), orderBy("timestamp", "desc"), limit(24));
-            const snap = await getDocs(q);
+            if (!await initFirebase()) throw new Error("Firebase unavailable");
+            const q = firebaseAPI.query(
+                firebaseAPI.collection(db, "messages"),
+                firebaseAPI.orderBy("timestamp", "desc"),
+                firebaseAPI.limit(maxMessages)
+            );
+            const snap = await firebaseAPI.getDocs(q);
             snap.forEach(doc => data.push(doc.data()));
             data.reverse();
         } catch (err) {
             console.warn("Firebase read failed, using fallback messages.", err);
         }
 
-        if (!data.length) {
-            data = fallbackMessages;
-        }
-
+        if (!data.length) data = fallbackMessages;
+        data = data.slice(-maxMessages);
         if (token !== this.wallToken) return;
 
         canvas.innerHTML = "";
@@ -983,19 +873,18 @@ const app = {
 
                 const spread = Math.max(gutter, cw - cardWidth - gutter * 2);
                 const startX = gutter + ((i * (cardWidth * .72)) % spread);
-                const jitter = (Math.random() - .5) * Math.min(120, spread * .18);
+                const jitter = (Math.random() - .5) * Math.min(110, spread * .18);
                 const card = new PhysicsCard(
-                    item.emoji || "水",
+                    item.emoji || "💧",
                     item.message || "",
                     Math.max(gutter, Math.min(cw - cardWidth - gutter, startX + jitter)),
-                    -190 - Math.random() * 90,
+                    -190 - Math.random() * 80,
                     cw,
-                    ch,
-                    i
+                    ch
                 );
 
                 const el = document.createElement("div");
-                el.className = "message-card";
+                el.className = `message-card tone-${i % 3}`;
                 el.innerHTML = `
                     <div class="card-number">#${i + 1}</div>
                     <div class="message-emoji">${escapeHTML(card.emoji)}</div>
@@ -1005,7 +894,7 @@ const app = {
                 canvas.appendChild(el);
                 card.el = el;
                 this.cards.push(card);
-            }, i * 160);
+            }, i * 150);
         });
     },
 
@@ -1021,7 +910,7 @@ const app = {
             card.cw = cw;
             card.ch = ch;
             card.w = mobile ? 132 : 230;
-            card.h = mobile ? 92 : 154;
+            card.h = mobile ? 92 : 152;
             card.x = Math.min(card.x, Math.max(0, cw - card.w));
             card.y = Math.min(card.y, Math.max(0, ch - card.h));
             card.isRest = false;
@@ -1037,7 +926,6 @@ const app = {
                 if (card.el) {
                     card.el.style.left = `${card.x}px`;
                     card.el.style.top = `${card.y}px`;
-                    card.el.style.transform = `rotate(${card.rot}deg)`;
                 }
             });
         }
